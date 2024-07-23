@@ -1,5 +1,5 @@
 """
-WSGI config for Dice project.
+WSGI config for LMS project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

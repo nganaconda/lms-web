@@ -1,1 +1,1 @@
-# SecureDiceGame
+# Learning Management System
