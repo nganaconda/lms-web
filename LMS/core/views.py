@@ -31,6 +31,7 @@ class LoginAndRegister():
     last_name="admin"
     email="admin@aueb.gr"
     password="R3nd0mP@ssw0rd!"
+    is_admin=True
 
     if Users.objects.filter(username=username).exists():
                 print('Username already exists.')
@@ -38,13 +39,13 @@ class LoginAndRegister():
                 with connection.cursor() as cursor:
                             cursor.execute(
                                 """
-                                INSERT INTO users (username, first_name, last_name, email, password)
-                                VALUES (%s, %s, %s, %s, %s)
+                                INSERT INTO users (username, first_name, last_name, email, password, is_admin)
+                                VALUES (%s, %s, %s, %s, %s, %s)
                                 """,
-                                [username,first_name,last_name,email,password]
+                                [username,first_name,last_name,email,password,is_admin]
                             )
                 
-                user = Users(username=username, first_name=first_name, last_name=last_name, email=email)
+                user = Users(username=username, first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
                 user.set_password(password)
                 user.save()
 
@@ -53,6 +54,7 @@ class LoginAndRegister():
     last_name="student"
     email="student@aueb.gr"
     password="R3nd0mP@ssw0rdForStudent!"
+    is_admin=False
 
     if Users.objects.filter(username=username).exists():
                 print('Username already exists.')
@@ -60,13 +62,13 @@ class LoginAndRegister():
                 with connection.cursor() as cursor:
                             cursor.execute(
                                 """
-                                INSERT INTO users (username, first_name, last_name, email, password)
-                                VALUES (%s, %s, %s, %s, %s)
+                                INSERT INTO users (username, first_name, last_name, email, password, is_admin)
+                                VALUES (%s, %s, %s, %s, %s, %s)
                                 """,
-                                [username,first_name,last_name,email,password]
+                                [username,first_name,last_name,email,password,is_admin]
                             )
                 
-                user = Users(username=username, first_name=first_name, last_name=last_name, email=email)
+                user = Users(username=username, first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
                 user.set_password(password)
                 user.save()
 

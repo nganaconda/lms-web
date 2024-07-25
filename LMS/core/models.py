@@ -44,11 +44,11 @@ class Users(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=100,unique=True)
     password = models.CharField(max_length=100)
+    is_admin = models.BooleanField(default=False)
     last_login = ""
     is_superuser = True
     is_staff = True
     is_active = True
-    is_admin = True
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name' , 'last_name']
 

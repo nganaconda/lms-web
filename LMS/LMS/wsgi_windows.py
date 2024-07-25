@@ -13,12 +13,12 @@ import sys
 import site
 
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "Dice.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "LMS.settings"
            
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Dice.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LMS.settings')
 os.environ['HTTPS'] = "on"
-sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/dicegame-web/Dice/Dice')
-sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/dicegame-web/Dice')
-sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/dicegame-web/Dice/core')
-sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/dicegame-web/venv/Lib/site-packages')
+sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/lms-web/LMS/LMS')
+sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/lms-web/LMS')
+sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/lms-web/LMS/core')
+sys.path.append('C:/Users/user/Desktop/NGANACONDA/Projects/lms-web/venv/Lib/site-packages')
 application = get_wsgi_application()
