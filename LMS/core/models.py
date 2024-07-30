@@ -133,6 +133,32 @@ class TestScore(models.Model):
     result = models.FloatField()
     test = models.ForeignKey(Test, related_name='test_scores', on_delete=models.CASCADE)
     student = models.ForeignKey(Student, related_name='test_scores', on_delete=models.CASCADE)
+    student_performance = models.ForeignKey('StudentPerformance', related_name='test_scores', on_delete=models.CASCADE)
+    class_performance = models.ForeignKey('ClassPerformance', related_name='test_scores', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"TestScore {self.gid} - Result: {self.result}, Test: {self.test.gid}, Student: {self.student.gid}"
+    
+
+class StudentPerformance(models.Model):
+    class Meta:
+        db_table = 'StudentPerformances'
+    
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    score = models.FloatField()
+    student = models.OneToOneField(Student, related_name='performance', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"StudentPerformance {self.gid} - Score: {self.score}, Student: {self.student.gid}"
+
+
+class ClassPerformance(models.Model):
+    class Meta:
+        db_table = 'ClassPerformances'
+    
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    class_name = models.CharField(max_length=100)
+    professor = models.ForeignKey(Professor, related_name='class_performances', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"ClassPerformance {self.gid} - Class: {self.class_name}, Professor: {self.professor.gid}"
