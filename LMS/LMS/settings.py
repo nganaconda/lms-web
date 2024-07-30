@@ -113,8 +113,8 @@ WSGI_APPLICATION = 'LMS.wsgi_windows.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'GDPR',
-        'HOST': '127.0.0.1',
+        'NAME': 'lmsdb',
+        'HOST': 'localhost',
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': 'gate123@A',
@@ -166,7 +166,7 @@ parent_dir = os.path.dirname(current_dir)
 STATIC_ROOT=os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(parent_dir, 'static', 'dice') 
+    os.path.join(parent_dir, 'LMS', 'static', 'dice') 
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
