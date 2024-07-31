@@ -23,6 +23,7 @@ from .models import Users
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+import uuid
 
 User = get_user_model()
 class LoginAndRegister():
@@ -36,14 +37,14 @@ class LoginAndRegister():
     if Users.objects.filter(username=username).exists():
                 print('Username already exists.')
     else:
-                with connection.cursor() as cursor:
-                            cursor.execute(
-                                """
-                                INSERT INTO users (username, first_name, last_name, email, password, is_admin)
-                                VALUES (%s, %s, %s, %s, %s, %s)
-                                """,
-                                [username,first_name,last_name,email,password,is_admin]
-                            )
+                # with connection.cursor() as cursor:
+                #             cursor.execute(
+                #                 """
+                #                 INSERT INTO users (gid, username, first_name, last_name, email, password, is_admin)
+                #                 VALUES (%s, %s, %s, %s, %s, %s, %s)
+                #                 """,
+                #                 [str(uuid.uuid4()),username,first_name,last_name,email,password,is_admin]
+                #             )
                 
                 user = Users(username=username, first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
                 user.set_password(password)
@@ -59,14 +60,14 @@ class LoginAndRegister():
     if Users.objects.filter(username=username).exists():
                 print('Username already exists.')
     else:
-                with connection.cursor() as cursor:
-                            cursor.execute(
-                                """
-                                INSERT INTO users (username, first_name, last_name, email, password, is_admin)
-                                VALUES (%s, %s, %s, %s, %s, %s)
-                                """,
-                                [username,first_name,last_name,email,password,is_admin]
-                            )
+                # with connection.cursor() as cursor:
+                #             cursor.execute(
+                #                 """
+                #                 INSERT INTO users (gid, username, first_name, last_name, email, password, is_admin)
+                #                 VALUES (%s, %s, %s, %s, %s, %s, %s)
+                #                 """,
+                #                 [str(uuid.uuid4()),username,first_name,last_name,email,password,is_admin]
+                #             )
                 
                 user = Users(username=username, first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
                 user.set_password(password)
@@ -77,7 +78,7 @@ class LoginAndRegister():
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            con = mysql.connector.connect(host="localhost", user="root", passwd="gate123@A", database="GDPR")
+            con = mysql.connector.connect(host="localhost", user="root", passwd="gate123@A", database="LMSDB")
             cursor = con.cursor()
 
             try:

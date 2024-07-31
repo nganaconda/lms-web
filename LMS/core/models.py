@@ -77,7 +77,7 @@ class Student(Users):
     class Meta:
         db_table = 'Students'
     
-    reg_number = models.CharField(max_length=100)
+    reg_number = models.CharField(max_length=50)
     year = models.IntegerField()
 
     def __str__(self):
