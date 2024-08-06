@@ -94,7 +94,7 @@ class LoginAndRegister():
                         
                         Rb = generate_nonce(10)
                         request.session['Rb'] = Rb
-                        return redirect('play_game')
+                        return redirect('portfolio')
                     else:
                         messages.error(request, "Invalid username or password.")
                 else:
@@ -141,7 +141,7 @@ class LoginAndRegister():
 def generate_nonce(length):
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(length))
 
-def play_game(request):
+def portfolio(request):
     username = request.session.get('username')
 
     if not username:
@@ -166,7 +166,7 @@ def play_game(request):
 
         return redirect('ask_server')
 
-    return render(request, 'core/play_game.html', contextNow)
+    return render(request, 'core/portfolio.html', contextNow)
 
 
 def ask_server(request):
