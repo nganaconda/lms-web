@@ -95,24 +95,11 @@ class Test(models.Model):
     questions_no = models.IntegerField()
     questions_dif = models.IntegerField()
     questions = models.ManyToManyField('Question', related_name='tests')
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Test {self.gid} - Type: {self.type}, Level: {self.level}, Age: {self.age}"
-    
 
-class Question(models.Model):
-    class Meta:
-        db_table = 'Questions'
-    
-    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    question = models.CharField(max_length=100)
-    type = models.CharField(max_length=100)
-    difficulty = models.IntegerField()
-    attributes = models.ManyToManyField('Attribute', related_name='questions')
-
-    def __str__(self):
-        return f"Question with id {self.gid} - Question: {self.question}, Tpye: {self.type}, Difficulty: {self.difficulty}"
-    
 
 class Attribute(models.Model):
     class Meta:
@@ -123,7 +110,22 @@ class Attribute(models.Model):
 
     def __str__(self):
         return f"Attribute with id {self.gid} - Answer: {self.answer}"
+      
 
+class Question(models.Model):
+    class Meta:
+        db_table = 'Questions'
+    
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    question = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
+    difficulty = models.IntegerField()
+    attributes = models.ManyToManyField('Attribute', related_name='questions')
+    rightAnswer = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Question with id {self.gid} - Question: {self.question}, Tpye: {self.type}, Difficulty: {self.difficulty}"
+    
 
 class TestScore(models.Model):
     class Meta:

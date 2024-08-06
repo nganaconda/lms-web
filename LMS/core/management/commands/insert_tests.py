@@ -28,7 +28,8 @@ class Command(BaseCommand):
                     '4 is an even number',
                     '2 is a prime number',
                     'Addition of positive numbers'
-                ]
+                ],
+                'rightAnswer': '2 + 2 = 4'
             },
             {
                 'question': 'What is 5 - 3?',
@@ -39,7 +40,8 @@ class Command(BaseCommand):
                     '2 is an even number',
                     '5 is a prime number',
                     'Subtraction of positive numbers'
-                ]
+                ],
+                'rightAnswer': '5 - 3 = 2'
             },
             {
                 'question': 'What is 3 * 3?',
@@ -50,7 +52,8 @@ class Command(BaseCommand):
                     '9 is a square number',
                     '3 is a prime number',
                     'Multiplication of single digits'
-                ]
+                ],
+                'rightAnswer': '3 * 3 = 9'
             }
         ]
 
@@ -72,6 +75,15 @@ class Command(BaseCommand):
                 
                 # Associate the question with attributes
                 question.attributes.add(attribute)
+
+                ansr = q_data['rightAnswer']
+                self.stdout.write(self.style.SUCCESS(f'ATTR VALUE: {attr}'))
+                self.stdout.write(self.style.SUCCESS(f'QDATA VALUE: {ansr}'))
+                if attr == ansr:
+                    self.stdout.write(self.style.SUCCESS(f'MPHKE'))
+                    question.rightAnswer = attribute
+                    question.save()
+
                 self.stdout.write(self.style.SUCCESS(f'Linked Question {question.gid} with Attribute {attribute.gid}'))
 
             # Associate the test with questions

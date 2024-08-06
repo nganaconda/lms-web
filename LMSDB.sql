@@ -388,14 +388,18 @@ CREATE TABLE Tests (
     age INT NOT NULL,
     type VARCHAR(100) NOT NULL,
     questions_no INT NOT NULL,
-    questions_dif INT NOT NULL
+    questions_dif INT NOT NULL,
+    professor_id CHAR(36) NOT NULL,
+    FOREIGN KEY (professor_id) REFERENCES Professors(gid)
 );
-
+drop table tests;
 CREATE TABLE Questions (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     question VARCHAR(100) NOT NULL,
     type VARCHAR(100) NOT NULL,
-    difficulty INT NOT NULL
+    difficulty INT NOT NULL,
+    rightAnswer_id CHAR(36),
+    FOREIGN KEY (rightAnswer_id) REFERENCES Attributes(gid)
 );
 
 CREATE TABLE Attributes (
@@ -403,20 +407,20 @@ CREATE TABLE Attributes (
     answer VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE TestQuestions (
-    test_gid CHAR(36) NOT NULL,
-    question_gid CHAR(36) NOT NULL,
-    PRIMARY KEY (test_gid, question_gid),
-    FOREIGN KEY (test_gid) REFERENCES Tests(gid),
-    FOREIGN KEY (question_gid) REFERENCES Questions(gid)
+CREATE TABLE tests_questions (
+    test_id CHAR(36) NOT NULL,
+    question_id CHAR(36) NOT NULL,
+    PRIMARY KEY (test_id, question_id),
+    FOREIGN KEY (test_id) REFERENCES Tests(gid),
+    FOREIGN KEY (question_id) REFERENCES Questions(gid)
 );
 
-CREATE TABLE QuestionAttributes (
-    question_gid CHAR(36) NOT NULL,
-    attribute_gid CHAR(36) NOT NULL,
-    PRIMARY KEY (question_gid, attribute_gid),
-    FOREIGN KEY (question_gid) REFERENCES Questions(gid),
-    FOREIGN KEY (attribute_gid) REFERENCES Attributes(gid)
+CREATE TABLE questions_attributes (
+    question_id CHAR(36) NOT NULL,
+    attribute_id CHAR(36) NOT NULL,
+    PRIMARY KEY (question_id, attribute_id),
+    FOREIGN KEY (question_id) REFERENCES Questions(gid),
+    FOREIGN KEY (attribute_id) REFERENCES Attributes(gid)
 );
 
 CREATE TABLE TestScores (
