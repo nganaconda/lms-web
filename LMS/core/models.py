@@ -63,26 +63,43 @@ class Users(AbstractBaseUser):
     objects = UserAccountManager()
 
 
-class Professor(Users):
+class Professor(models.Model):
     class Meta:
         db_table = 'Professors'
     
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     department = models.CharField(max_length=100)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Professor {self.first_name} {self.last_name} - Department: {self.department}"
 
 
-class Student(Users):
+class Student(models.Model):
     class Meta:
         db_table = 'Students'
     
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reg_number = models.CharField(max_length=50)
     year = models.IntegerField()
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Student {self.first_name} {self.last_name} - Registration Number: {self.reg_number}, Year: {self.year}"
 
+
+class ClassGroup(models.Model):
+    class Meta:
+        db_table = 'ClassGroups'
+    
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    class_name = models.CharField(max_length=100)
+    professors = models.ManyToManyField('Professor', related_name='classGroups')
+    students = models.ManyToManyField('Student')
+
+    def __str__(self):
+        return f"ClassPerformance {self.gid} - Class: {self.class_name}"
+    
 
 class Test(models.Model):
     class Meta:
@@ -96,6 +113,7 @@ class Test(models.Model):
     questions_dif = models.IntegerField()
     questions = models.ManyToManyField('Question', related_name='tests')
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
+    classGroup = models.ForeignKey(ClassGroup, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Test {self.gid} - Type: {self.type}, Level: {self.level}, Age: {self.age}"
@@ -135,32 +153,18 @@ class TestScore(models.Model):
     result = models.FloatField()
     test = models.ForeignKey(Test, related_name='test_scores', on_delete=models.CASCADE)
     student = models.ForeignKey(Student, related_name='test_scores', on_delete=models.CASCADE)
-    student_performance = models.ForeignKey('StudentPerformance', related_name='test_scores', on_delete=models.CASCADE)
-    class_performance = models.ForeignKey('ClassPerformance', related_name='test_scores', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"TestScore {self.gid} - Result: {self.result}, Test: {self.test.gid}, Student: {self.student.gid}"
     
 
-class StudentPerformance(models.Model):
-    class Meta:
-        db_table = 'StudentPerformances'
+# class StudentPerformance(models.Model):
+#     class Meta:
+#         db_table = 'StudentPerformances'
     
-    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    score = models.FloatField()
-    student = models.OneToOneField(Student, related_name='performance', on_delete=models.CASCADE)
+#     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     score = models.FloatField()
+#     student = models.OneToOneField(Student, related_name='performance', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"StudentPerformance {self.gid} - Score: {self.score}, Student: {self.student.gid}"
-
-
-class ClassPerformance(models.Model):
-    class Meta:
-        db_table = 'ClassPerformances'
-    
-    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    class_name = models.CharField(max_length=100)
-    professor = models.ForeignKey(Professor, related_name='class_performances', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"ClassPerformance {self.gid} - Class: {self.class_name}, Professor: {self.professor.gid}"
+#     def __str__(self):
+#         return f"StudentPerformance {self.gid} - Score: {self.score}, Student: {self.student.gid}"

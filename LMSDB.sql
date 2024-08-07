@@ -367,19 +367,41 @@ CREATE TABLE Users (
     password VARCHAR(100) NOT NULL,
     is_admin BOOLEAN NOT NULL DEFAULT 0
 );
+
 CREATE TABLE Professors (
     gid CHAR(36) PRIMARY KEY NOT NULL,
-    user_gid CHAR(36) NOT NULL,
     department VARCHAR(100) NOT NULL,
-    FOREIGN KEY (user_gid) REFERENCES Users(gid)
+    user_id CHAR(36) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(gid)
 );
 
 CREATE TABLE Students (
     gid CHAR(36) PRIMARY KEY NOT NULL,
-    user_gid CHAR(36) NOT NULL,
 	reg_number VARCHAR(50) NOT NULL UNIQUE,
+    user_id CHAR(36) NOT NULL,
     year INT NOT NULL,
-    FOREIGN KEY (user_gid) REFERENCES Users(gid)
+    FOREIGN KEY (user_id) REFERENCES Users(gid)
+);
+
+CREATE TABLE classGroups (
+    gid CHAR(36) PRIMARY KEY NOT NULL,
+    class_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE classGroups_professors (
+    classGroup_id CHAR(36) NOT NULL,
+    professor_id CHAR(36) NOT NULL,
+    PRIMARY KEY (classGroup_id, professor_id),
+    FOREIGN KEY (classGroup_id) REFERENCES classGroups(gid),
+    FOREIGN KEY (professor_id) REFERENCES professors(gid)
+);
+
+CREATE TABLE classGroups_students (
+    classGroup_id CHAR(36) NOT NULL,
+    student_id CHAR(36) NOT NULL,
+    PRIMARY KEY (classGroup_id, student_id),
+    FOREIGN KEY (classGroup_id) REFERENCES classGroups(gid),
+    FOREIGN KEY (student_id) REFERENCES students(gid)
 );
 
 CREATE TABLE Tests (
@@ -389,10 +411,17 @@ CREATE TABLE Tests (
     type VARCHAR(100) NOT NULL,
     questions_no INT NOT NULL,
     questions_dif INT NOT NULL,
-    professor_id CHAR(36) NOT NULL,
-    FOREIGN KEY (professor_id) REFERENCES Professors(gid)
+    professor_id CHAR(36),
+    classGroup_id CHAR(36),
+    FOREIGN KEY (professor_id) REFERENCES Professors(gid),
+    FOREIGN KEY (classGroup_id) REFERENCES ClassGroups(gid)
 );
-drop table tests;
+
+CREATE TABLE Attributes (
+    gid CHAR(36) PRIMARY KEY NOT NULL,
+    answer VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE Questions (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     question VARCHAR(100) NOT NULL,
@@ -400,11 +429,6 @@ CREATE TABLE Questions (
     difficulty INT NOT NULL,
     rightAnswer_id CHAR(36),
     FOREIGN KEY (rightAnswer_id) REFERENCES Attributes(gid)
-);
-
-CREATE TABLE Attributes (
-    gid CHAR(36) PRIMARY KEY NOT NULL,
-    answer VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE tests_questions (
@@ -423,44 +447,11 @@ CREATE TABLE questions_attributes (
     FOREIGN KEY (attribute_id) REFERENCES Attributes(gid)
 );
 
-CREATE TABLE TestScores (
+CREATE TABLE testScores (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     result FLOAT NOT NULL,
-    test_gid CHAR(36) NOT NULL,
-    student_gid CHAR(36) NOT NULL,
-    classperformance_gid CHAR(36) NOT NULL,
-    FOREIGN KEY (test_gid) REFERENCES Tests(gid),
-    FOREIGN KEY (student_gid) REFERENCES Students(gid),
-    FOREIGN KEY (classperformance_gid) REFERENCES ClassPerformances(gid)
-);
-
-CREATE TABLE StudentPerformances (
-    gid CHAR(36) PRIMARY KEY NOT NULL,
-    score FLOAT NOT NULL,
-    student_gid CHAR(36) NOT NULL,
-    FOREIGN KEY (student_gid) REFERENCES Students(gid),
-    UNIQUE (student_gid)
-);
-
-CREATE TABLE StudentPerformanceTestScores (
-    student_performance_gid CHAR(36) NOT NULL,
-    test_score_gid CHAR(36) NOT NULL,
-    PRIMARY KEY (student_performance_gid, test_score_gid),
-    FOREIGN KEY (student_performance_gid) REFERENCES StudentPerformance(gid),
-    FOREIGN KEY (test_score_gid) REFERENCES TestScores(gid)
-);
-
-CREATE TABLE ClassPerformances (
-    gid CHAR(36) PRIMARY KEY NOT NULL,
-    class VARCHAR(100) NOT NULL,
-    professor_gid CHAR(36) NOT NULL,
-    FOREIGN KEY (professor_gid) REFERENCES Professors(gid)
-);
-
-CREATE TABLE ClassPerformanceTestScore (
-    class_performance_gid CHAR(36) NOT NULL,
-    test_score_gid CHAR(36) NOT NULL,
-    PRIMARY KEY (class_performance_gid, test_score_gid),
-    FOREIGN KEY (class_performance_gid) REFERENCES ClassPerformance(gid),
-    FOREIGN KEY (test_score_gid) REFERENCES TestScores(gid)
+    test_id CHAR(36) NOT NULL,
+    student_id CHAR(36) NOT NULL,
+    FOREIGN KEY (test_id) REFERENCES Tests(gid),
+    FOREIGN KEY (student_id) REFERENCES Students(gid)
 );

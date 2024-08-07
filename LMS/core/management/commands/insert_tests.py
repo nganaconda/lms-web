@@ -1,6 +1,6 @@
 import uuid
 from django.core.management.base import BaseCommand
-from core.models import Test, Question, Attribute
+from core.models import Test, Question, Attribute, Users, Professor, Student, TestScore, ClassGroup
 
 class Command(BaseCommand):
     help = 'Populates the database with test data'
@@ -89,5 +89,42 @@ class Command(BaseCommand):
             # Associate the test with questions
             test.questions.add(question)
             self.stdout.write(self.style.SUCCESS(f'Linked Test {test.gid} with Question {question.gid}'))
+
+        try:
+            userP = Users.objects.get(username='admin')
+
+            professor = Professor.objects.create(
+                department = 'Informatics',
+                user = userP
+            )
+
+            test.professor = professor
+            test.save()
+
+            userS = Users.objects.get(username='f3312305')
+
+            student = Student.objects.create(
+                reg_number = 'f3312305',
+                year = 2023,
+                user = userS
+            )
+            
+            classGr = ClassGroup.objects.create(
+                class_name = '2023-2024 Full-Time Students',
+
+            )
+            classGr.professors.add(professor)
+            classGr.students.add(student)
+            classGr.save()
+
+            testscore = TestScore.objects.create(
+                result = 9.0,
+                test = test,
+                student = student
+            )
+
+            self.stdout.write(self.style.SUCCESS('Professor added successfully.'))
+        except Users.DoesNotExist:
+            print("User not found")
 
         self.stdout.write(self.style.SUCCESS('Data population complete'))
