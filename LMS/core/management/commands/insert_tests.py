@@ -9,6 +9,7 @@ class Command(BaseCommand):
         # Create a test of type "math"
         test = Test.objects.create(
             gid=uuid.uuid4(),
+            test_name='2024 Sep Exams Math',
             level=1,
             age=10,
             type='math',
@@ -116,6 +117,9 @@ class Command(BaseCommand):
             classGr.professors.add(professor)
             classGr.students.add(student)
             classGr.save()
+
+            test.classGroup = classGr
+            test.save()
 
             testscore = TestScore.objects.create(
                 result = 9.0,

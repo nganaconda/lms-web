@@ -24,6 +24,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
+from core.models import Test, Question, Attribute, Users, Professor, Student, TestScore, ClassGroup
 
 User = get_user_model()
 class LoginAndRegister():
@@ -147,26 +148,91 @@ def portfolio(request):
     if not username:
         return redirect('login')  # Assuming there's a login view
     
-    Rb = generate_nonce(10)
-    contextNow = {
-            'username': username,
-            'Rb': Rb
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        contextNow = {
+             'username': username
         }
-    if request.method == 'POST':
-        # Step 1: Generate random strings Ra and Rb
-        Ra = generate_nonce(10)
-        request.session['Ra'] = Ra
-        request.session['Rb'] = Rb
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+                return render(request, 'professor_home.html', {'professor': professor})
+            except Professor.DoesNotExist:
+                return redirect('error_page')  # Or handle as appropriate
+        else:  # Non-admin users are students
+            try:
+                student = Student.objects.get(user=user)
+
+                # Retrieve all TestScore objects associated with this student
+                test_scores = TestScore.objects.filter(student=student)
+
+                # Prepare a list of tests with their GIDs and names
+                tests_info = []
+                for test_score in test_scores:
+                    test = test_score.test
+                    tests_info.append({
+                        'gid': test.gid,
+                        'name': test.test_name,
+                        'score': test_score.result,
+                        'date': test.createdAt
+                    })
+                
+                # Add the list to the context
+                contextNow['tests_info'] = tests_info
+
+                return render(request, 'core/portfolio.html', contextNow)
+            except Student.DoesNotExist:
+                return redirect('error_page')  # Or handle as appropriate
+
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
+
+    # try:
+    #     cursor.execute("SELECT password FROM users WHERE username=%s --", [username])
+    #     row = cursor.fetchone()
         
-        # Step 2: Anne rolls a dice (simulation)
-        roll_the_dice_client  = secrets.choice('123456')
+    #     if row is not None:
+    #         password_saved = row[0]
+    #         is_password_valid = check_password(password, password_saved)
 
-        # Store relevant session data
-        request.session['roll_the_dice_client'] = roll_the_dice_client
+    #         if is_password_valid:
+    #             request.session['username'] = username
+                
+    #             Rb = generate_nonce(10)
+    #             request.session['Rb'] = Rb
+    #             return redirect('portfolio')
+    #         else:
+    #             messages.error(request, "Invalid username or password.")
+    #     else:
+    #         messages.error(request, "Invalid username or password.")
 
-        return redirect('ask_server')
+    # except mysql.connector.Error as err:
+    #     messages.error(request, "An error occurred during login.")
 
-    return render(request, 'core/portfolio.html', contextNow)
+    
+    # Rb = generate_nonce(10)
+    # contextNow = {
+    #         'username': username,
+    #         'Rb': Rb
+    #     }
+    # if request.method == 'POST':
+    #     # Step 1: Generate random strings Ra and Rb
+    #     Ra = generate_nonce(10)
+    #     request.session['Ra'] = Ra
+    #     request.session['Rb'] = Rb
+        
+    #     # Step 2: Anne rolls a dice (simulation)
+    #     roll_the_dice_client  = secrets.choice('123456')
+
+    #     # Store relevant session data
+    #     request.session['roll_the_dice_client'] = roll_the_dice_client
+
+    #     return redirect('ask_server')
+
+    # return render(request, 'core/portfolio.html', contextNow)
 
 
 def ask_server(request):

@@ -106,11 +106,13 @@ class Test(models.Model):
         db_table = 'Tests'
     
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    test_name = models.CharField(max_length=100)
     level = models.IntegerField()
     age = models.IntegerField()
     type = models.CharField(max_length=100)
     questions_no = models.IntegerField()
     questions_dif = models.IntegerField()
+    createdAt = models.DateTimeField(auto_now_add=True)  # Automatically set on creation
     questions = models.ManyToManyField('Question', related_name='tests')
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
     classGroup = models.ForeignKey(ClassGroup, on_delete=models.CASCADE)

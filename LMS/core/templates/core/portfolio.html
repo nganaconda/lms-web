@@ -9,9 +9,13 @@
 <body>
     <header>
         <div class="header-container">
-            <button onclick="location.href='/portfolio/'">Home</button>
-            <button onclick="location.href='/profile/'">{{ username }}</button>
-            <button onclick="location.href='/logout/'">Logout</button>
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
         </div>
     </header>
     <div class="main-container">
@@ -22,11 +26,36 @@
             <nav>
                 <ul>
                     <li><a href="/tests/">Tests</a></li>
+                    <!-- Dropdown list of tests -->
                 </ul>
             </nav>
         </aside>
         <main>
-            <!-- Main content will be added here -->
+            <section class="test-scores">
+                <h1>My Tests</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test in tests_info %}
+                            <tr>
+                                <td><a href="/tests/{{ test.gid }}/">{{ test.name }}</a></td>
+                                <td>{{ test.score }}</td>
+                                <td>{{ test.date }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3">No test scores available.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
         </main>
     </div>
 </body>
