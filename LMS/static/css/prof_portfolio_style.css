@@ -130,7 +130,7 @@ table tr:hover {
 }
 
 table a {
-    color: #007bff;
+    color: rgba(152,143,138,1);
     text-decoration: none;
 }
 

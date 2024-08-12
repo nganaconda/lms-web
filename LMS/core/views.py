@@ -139,8 +139,10 @@ class LoginAndRegister():
         
         return render(request, 'core/registration.html')
 
+
 def generate_nonce(length):
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(length))
+
 
 def portfolio(request):
     username = request.session.get('username')
@@ -159,7 +161,32 @@ def portfolio(request):
         if user.is_admin:  # Assuming `is_admin` is True for professors
             try:
                 professor = Professor.objects.get(user=user)
-                return render(request, 'professor_home.html', {'professor': professor})
+
+                # Retrieve all Test objects associated with this professor
+                tests = Test.objects.filter(professor=professor).order_by('-createdAt')
+                tests_info = []
+                for test in tests:
+                    test_scores = TestScore.objects.filter(test=test)
+                    average_score = 0
+                    no_of_scores = 0
+                    
+                    for test_score in test_scores:
+                         average_score += test_score.result
+                         no_of_scores += 1
+                    
+                    average_score = average_score / no_of_scores
+
+                    tests_info.append({
+                         'gid': test.gid,
+                         'name': test.test_name,
+                         'average': average_score,
+                         'date': test.createdAt
+                    })
+                
+                # Add the list to the context
+                contextNow['tests_info'] = tests_info
+
+                return render(request, 'core/professor_portfolio.html', contextNow)
             except Professor.DoesNotExist:
                 return redirect('error_page')  # Or handle as appropriate
         else:  # Non-admin users are students
@@ -167,7 +194,7 @@ def portfolio(request):
                 student = Student.objects.get(user=user)
 
                 # Retrieve all TestScore objects associated with this student
-                test_scores = TestScore.objects.filter(student=student)
+                test_scores = TestScore.objects.filter(student=student).select_related('test').order_by('-test__createdAt')
 
                 # Prepare a list of tests with their GIDs and names
                 tests_info = []
@@ -183,7 +210,7 @@ def portfolio(request):
                 # Add the list to the context
                 contextNow['tests_info'] = tests_info
 
-                return render(request, 'core/portfolio.html', contextNow)
+                return render(request, 'core/student_portfolio.html', contextNow)
             except Student.DoesNotExist:
                 return redirect('error_page')  # Or handle as appropriate
 
