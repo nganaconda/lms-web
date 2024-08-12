@@ -46,7 +46,7 @@
                             <tr>
                                 <td><a href="/tests/{{ test.gid }}/">{{ test.name }}</a></td>
                                 <td>{{ test.score }}</td>
-                                <td>{{ test.date }}</td>
+                                <td>{{ test.date|date:"d/m/Y" }}</td>
                             </tr>
                         {% empty %}
                             <tr>
@@ -56,7 +56,10 @@
                     </tbody>
                 </table>
             </section>
-        </main>
+        </main> 
     </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
 </body>
 </html>

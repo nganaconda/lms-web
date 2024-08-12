@@ -235,6 +235,76 @@ def portfolio(request):
     # return render(request, 'core/portfolio.html', contextNow)
 
 
+def profile_view(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        contextNow = {
+             'username': username
+        }
+
+        # Fetch common user info
+        full_name = f"{user.first_name} {user.last_name}"
+        username = user.username
+        email = user.email
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+                department = professor.department
+                reg_number = ""  # Professors don't have a reg number, leave as empty
+                year = ""  # Professors don't have a year, leave as empty
+            except Professor.DoesNotExist:
+                return redirect('error_page')  # Or handle as appropriate
+        else:  # Non-admin users are students
+            try:
+                student = Student.objects.get(user=user)
+                student = Student.objects.get(user=user)
+                reg_number = student.reg_number
+                year = student.year
+                department = ""  # Students don't have a department, leave as empty
+            except Student.DoesNotExist:
+                return redirect('error_page')  # Or handle as appropriate
+        
+        contextNow = {
+            'full_name': full_name,
+            'username': username,
+            'email': email,
+            'reg_number': reg_number,
+            'department': department,
+            'year': year,
+        }
+
+        return render(request, 'core/profile.html', contextNow)
+    
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
+
+
+def delete_user_view(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        user.delete()
+        return redirect('login')  # Redirect to login page after deletion
+
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
+
+
+
 def ask_server(request):
     username = request.session.get('username')
     Ra = request.session.get('Ra')
