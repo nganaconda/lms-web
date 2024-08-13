@@ -31,6 +31,7 @@ urlpatterns = [
     path('portfolio/', views.portfolio, name='portfolio'),
     path('profile/', views.profile_view, name='profile'),
     path('delete_user/', views.delete_user_view, name='delete_user'),
+    path('completed-test/<str:test_gid>/', views.completed_test_view, name='completed_test'),
     path('ask_server/', views.ask_server, name='ask_server'),
     path('calculate_winner/', views.calculate_winner, name='calculate_winner'),
     path('result/', views.result, name='result'),

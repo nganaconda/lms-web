@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.db import connection
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render,redirect
 from django.contrib import messages
 import logging
@@ -24,7 +24,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
-from core.models import Test, Question, Attribute, Users, Professor, Student, TestScore, ClassGroup
+from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
 
 User = get_user_model()
 class LoginAndRegister():
@@ -166,12 +166,12 @@ def portfolio(request):
                 tests = Test.objects.filter(professor=professor).order_by('-createdAt')
                 tests_info = []
                 for test in tests:
-                    test_scores = TestScore.objects.filter(test=test)
+                    completed_tests = CompletedTest.objects.filter(test=test)
                     average_score = 0
                     no_of_scores = 0
                     
-                    for test_score in test_scores:
-                         average_score += test_score.result
+                    for completed_test in completed_tests:
+                         average_score += completed_test.score
                          no_of_scores += 1
                     
                     average_score = average_score / no_of_scores
@@ -194,17 +194,18 @@ def portfolio(request):
                 student = Student.objects.get(user=user)
 
                 # Retrieve all TestScore objects associated with this student
-                test_scores = TestScore.objects.filter(student=student).select_related('test').order_by('-test__createdAt')
+                completed_tests = CompletedTest.objects.filter(student=student).select_related('test').order_by('-test__createdAt')
 
                 # Prepare a list of tests with their GIDs and names
                 tests_info = []
-                for test_score in test_scores:
-                    test = test_score.test
+                for completed_test in completed_tests:
+                    test = completed_test.test
                     tests_info.append({
                         'gid': test.gid,
                         'name': test.test_name,
-                        'score': test_score.result,
-                        'date': test.createdAt
+                        'score': completed_test.score,
+                        'date': test.createdAt,
+                        'completed_test_gid': completed_test.gid
                     })
                 
                 # Add the list to the context
@@ -216,50 +217,6 @@ def portfolio(request):
 
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
-
-    # try:
-    #     cursor.execute("SELECT password FROM users WHERE username=%s --", [username])
-    #     row = cursor.fetchone()
-        
-    #     if row is not None:
-    #         password_saved = row[0]
-    #         is_password_valid = check_password(password, password_saved)
-
-    #         if is_password_valid:
-    #             request.session['username'] = username
-                
-    #             Rb = generate_nonce(10)
-    #             request.session['Rb'] = Rb
-    #             return redirect('portfolio')
-    #         else:
-    #             messages.error(request, "Invalid username or password.")
-    #     else:
-    #         messages.error(request, "Invalid username or password.")
-
-    # except mysql.connector.Error as err:
-    #     messages.error(request, "An error occurred during login.")
-
-    
-    # Rb = generate_nonce(10)
-    # contextNow = {
-    #         'username': username,
-    #         'Rb': Rb
-    #     }
-    # if request.method == 'POST':
-    #     # Step 1: Generate random strings Ra and Rb
-    #     Ra = generate_nonce(10)
-    #     request.session['Ra'] = Ra
-    #     request.session['Rb'] = Rb
-        
-    #     # Step 2: Anne rolls a dice (simulation)
-    #     roll_the_dice_client  = secrets.choice('123456')
-
-    #     # Store relevant session data
-    #     request.session['roll_the_dice_client'] = roll_the_dice_client
-
-    #     return redirect('ask_server')
-
-    # return render(request, 'core/portfolio.html', contextNow)
 
 
 def profile_view(request):
@@ -330,6 +287,64 @@ def delete_user_view(request):
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
 
+
+def completed_test_view(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        # Retrieve the completed test using the provided GID
+        completed_test = get_object_or_404(CompletedTest, gid=test_gid)
+        
+        # Get all the answers related to this completed test
+        completed_test_answers = CompletedTestAnswer.objects.filter(completedTest=completed_test).select_related('question', 'attribute')
+        
+        # Prepare the data structure to be passed to the template
+        questions_info = []
+        
+        # Iterate through each question in the test
+        for question in completed_test.test.questions.all():
+            # Get all answers (attributes) related to the question
+            attributes = question.attributes.all()
+            question_data = {
+                'question_text': question.question,
+                'attributes': []
+            }
+            original_question = Question.objects.get(question=question.question)
+            
+            for attribute in attributes:
+                # Find the selected answer and whether it was correct
+                selected_answer = completed_test_answers.filter(question=question, attribute=attribute).first()
+                rightAnswer = original_question.rightAnswer
+                is_selected = selected_answer is not None
+                is_correct = selected_answer.is_correct if selected_answer else False
+                
+                question_data['attributes'].append({
+                    'answer_text': attribute.answer,
+                    'is_selected': is_selected,
+                    'is_correct': is_correct,
+                    'rightAnswer': rightAnswer.answer
+                })
+            
+            questions_info.append(question_data)
+        
+        context = {
+            'username': username,
+            'test_name': completed_test.test.test_name,
+            'score': completed_test.score,
+            'completion_date': completed_test.completion_date,
+            'questions_info': questions_info
+        }
+        
+        return render(request, 'core/completed_test.html', context)
+    
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
 
 
 def ask_server(request):

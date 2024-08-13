@@ -449,11 +449,23 @@ CREATE TABLE questions_attributes (
     FOREIGN KEY (attribute_id) REFERENCES Attributes(gid)
 );
 
-CREATE TABLE testScores (
+CREATE TABLE completedTests (
     gid CHAR(36) PRIMARY KEY NOT NULL,
-    result FLOAT NOT NULL,
+    completion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    score FLOAT NOT NULL,
     test_id CHAR(36) NOT NULL,
     student_id CHAR(36) NOT NULL,
     FOREIGN KEY (test_id) REFERENCES Tests(gid),
     FOREIGN KEY (student_id) REFERENCES Students(gid)
+);
+
+CREATE TABLE completedTestAnswers (
+    gid CHAR(36) PRIMARY KEY NOT NULL,
+    is_correct BOOLEAN NOT NULL DEFAULT 0,
+    question_id CHAR(36) NOT NULL,
+    attribute_id CHAR(36) NOT NULL,
+    completedTest_id CHAR(36) NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES Questions(gid),
+    FOREIGN KEY (attribute_id) REFERENCES Attributes(gid),
+    FOREIGN KEY (completedTest_id) REFERENCES completedTests(gid)
 );

@@ -1,6 +1,6 @@
 import uuid
 from django.core.management.base import BaseCommand
-from core.models import Test, Question, Attribute, Users, Professor, Student, TestScore, ClassGroup
+from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
 from datetime import datetime
 
 class Command(BaseCommand):
@@ -218,9 +218,9 @@ class Command(BaseCommand):
             )
             
             classGr = ClassGroup.objects.create(
-                class_name = '2023-2024 Full-Time Students',
-
+                class_name = '2023-2024 Full-Time Students'
             )
+
             classGr.professors.add(professor)
             classGr.students.add(student)
             classGr.students.add(studentNik)
@@ -231,28 +231,112 @@ class Command(BaseCommand):
             test1.classGroup = classGr
             test1.save()
 
-            testscore = TestScore.objects.create(
-                result = 9.0,
+            completedTest = CompletedTest.objects.create(
+                score = 6.7,
                 test = test,
                 student = student
             )
+            completedTestAnswer1 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 2 + 2?'),
+                attribute = Attribute.objects.get(answer='2 + 2 = 4'),
+                completedTest = completedTest
+            )
+            completedTestAnswer2 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 5 - 3?'),
+                attribute = Attribute.objects.get(answer='5 - 3 = 2'),
+                completedTest = completedTest
+            )
+            completedTestAnswer3 = CompletedTestAnswer.objects.create(
+                is_correct = False,
+                question = Question.objects.get(question='What is 3 * 3?'),
+                attribute = Attribute.objects.get(answer='9 is a square number'),
+                completedTest = completedTest
+            )
 
-            testscoreNik1 = TestScore.objects.create(
-                result = 10.0,
+            completedTestNik1 = CompletedTest.objects.create(
+                score = 10.0,
                 test = test,
                 student = studentNik
             )
+            completedTestAnswerNik1 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 2 + 2?'),
+                attribute = Attribute.objects.get(answer='2 + 2 = 4'),
+                completedTest = completedTestNik1
+            )
+            completedTestAnswerNik2 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 5 - 3?'),
+                attribute = Attribute.objects.get(answer='5 - 3 = 2'),
+                completedTest = completedTestNik1
+            )
+            completedTestAnswerNik3 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 3 * 3?'),
+                attribute = Attribute.objects.get(answer='3 * 3 = 9'),
+                completedTest = completedTestNik1
+            )
 
-            testscore1 = TestScore.objects.create(
-                result = 6.0,
+            completedTest1 = CompletedTest.objects.create(
+                score = 5.0,
                 test = test1,
                 student = student
             )
+            completedTestAnswer11 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is the square root of 25?'),
+                attribute = Attribute.objects.get(answer='5'),
+                completedTest = completedTest1
+            )
+            completedTestAnswer12 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 25000 / 100?'),
+                attribute = Attribute.objects.get(answer='250'),
+                completedTest = completedTest1
+            )
+            completedTestAnswer13 = CompletedTestAnswer.objects.create(
+                is_correct = False,
+                question = Question.objects.get(question='What is 3! ?'),
+                attribute = Attribute.objects.get(answer='3'),
+                completedTest = completedTest1
+            )
+            completedTestAnswer14 = CompletedTestAnswer.objects.create(
+                is_correct = False,
+                question = Question.objects.get(question='How many sides are there in a square?'),
+                attribute = Attribute.objects.get(answer='6 sides'),
+                completedTest = completedTest1
+            )
 
-            testscoreNik2 = TestScore.objects.create(
-                result = 7.5,
+            completedTestNik2 = CompletedTest.objects.create(
+                score = 7.5,
                 test = test1,
                 student = studentNik
+            )
+            completedTestAnswerNik21 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is the square root of 25?'),
+                attribute = Attribute.objects.get(answer='5'),
+                completedTest = completedTestNik2
+            )
+            completedTestAnswerNik22 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='What is 25000 / 100?'),
+                attribute = Attribute.objects.get(answer='250'),
+                completedTest = completedTestNik2
+            )
+            completedTestAnswerNik23 = CompletedTestAnswer.objects.create(
+                is_correct = False,
+                question = Question.objects.get(question='What is 3! ?'),
+                attribute = Attribute.objects.get(answer='3'),
+                completedTest = completedTestNik2
+            )
+            completedTestAnswerNik24 = CompletedTestAnswer.objects.create(
+                is_correct = True,
+                question = Question.objects.get(question='How many sides are there in a square?'),
+                attribute = Attribute.objects.get(answer='4 sides'),
+                completedTest = completedTestNik2
             )
 
             self.stdout.write(self.style.SUCCESS('Professor added successfully.'))

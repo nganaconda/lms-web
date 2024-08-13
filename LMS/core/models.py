@@ -112,7 +112,7 @@ class Test(models.Model):
     type = models.CharField(max_length=100)
     questions_no = models.IntegerField()
     questions_dif = models.IntegerField()
-    createdAt = models.DateTimeField()  # Automatically set on creation
+    createdAt = models.DateTimeField()
     questions = models.ManyToManyField('Question', related_name='tests')
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
     classGroup = models.ForeignKey(ClassGroup, on_delete=models.CASCADE)
@@ -147,26 +147,29 @@ class Question(models.Model):
         return f"Question with id {self.gid} - Question: {self.question}, Tpye: {self.type}, Difficulty: {self.difficulty}"
     
 
-class TestScore(models.Model):
+class CompletedTest(models.Model):
     class Meta:
-        db_table = 'TestScores'
+        db_table = 'CompletedTests'
     
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    result = models.FloatField()
-    test = models.ForeignKey(Test, related_name='test_scores', on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, related_name='test_scores', on_delete=models.CASCADE)
+    completion_date = models.DateTimeField(auto_now_add=True)
+    score = models.FloatField()
+    test = models.ForeignKey(Test, related_name='completed_tests', on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, related_name='completed_tests', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"TestScore {self.gid} - Result: {self.result}, Test: {self.test.gid}, Student: {self.student.gid}"
     
 
-# class StudentPerformance(models.Model):
-#     class Meta:
-#         db_table = 'StudentPerformances'
+class CompletedTestAnswer(models.Model):
+    class Meta:
+        db_table = 'CompletedTestAnswers'
     
-#     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     score = models.FloatField()
-#     student = models.OneToOneField(Student, related_name='performance', on_delete=models.CASCADE)
-
-#     def __str__(self):
-#         return f"StudentPerformance {self.gid} - Score: {self.score}, Student: {self.student.gid}"
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    is_correct = models.BooleanField(default=False)
+    question = models.ForeignKey(Question, related_name='completed_test_answers', on_delete=models.CASCADE)
+    attribute = models.ForeignKey(Attribute, related_name='completed_test_answers', on_delete=models.CASCADE)
+    completedTest = models.ForeignKey(CompletedTest, related_name='completed_test_answers', on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"TestScore {self.gid} - Result: {self.result}, Test: {self.test.gid}, Student: {self.student.gid}"

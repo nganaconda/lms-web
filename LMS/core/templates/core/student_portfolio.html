@@ -44,7 +44,7 @@
                     <tbody>
                         {% for test in tests_info %}
                             <tr>
-                                <td><a href="/tests/{{ test.gid }}/">{{ test.name }}</a></td>
+                                <td><a href="{% url 'completed_test' test.completed_test_gid %}">{{ test.name }}</a></td>
                                 <td>{{ test.score }}</td>
                                 <td>{{ test.date|date:"d/m/Y" }}</td>
                             </tr>

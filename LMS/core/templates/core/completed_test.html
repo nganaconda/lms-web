@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ test_name }} - Completed Test</title>
+    <link rel="stylesheet" href="/static/css/completed_test_style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/tests/">Tests</a></li>
+                    <!-- Dropdown list of tests -->
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <section class="completed-test">
+                <h1>{{ test_name }}</h1>
+                <p>Score: {{ score }}</p>
+                <p>Completed on: {{ completion_date|date:"d/m/Y" }}</p>
+                
+                {% for question in questions_info %}
+                    <div class="question">
+                        <h2>{{ question.question_text }}</h2>
+                        <ul>
+                            {% for attribute in question.attributes %}
+                                <li class="{% if attribute.answer_text == attribute.rightAnswer %}correct{% endif %} {% if attribute.is_selected and not attribute.is_correct %}incorrect{% endif %}">
+                                    <input type="radio" {% if attribute.is_selected %}checked{% endif %} disabled>
+                                    <label>{{ attribute.answer_text }}</label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </section>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
+</body>
+</html>
