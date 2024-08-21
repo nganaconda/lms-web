@@ -142,6 +142,7 @@ class Question(models.Model):
     difficulty = models.IntegerField()
     attributes = models.ManyToManyField('Attribute', related_name='questions')
     rightAnswer = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Question with id {self.gid} - Question: {self.question}, Tpye: {self.type}, Difficulty: {self.difficulty}"

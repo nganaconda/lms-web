@@ -347,6 +347,51 @@ def completed_test_view(request, test_gid):
         return redirect('error_page')  # Or handle as appropriate
 
 
+def my_test_questions(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        contextNow = {
+             'username': username
+        }
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+
+                # Get distinct question types
+                question_types = Question.objects.filter(professor=professor).values_list('type', flat=True).distinct()
+
+                context = {
+                    'username': username,
+                    'question_types': question_types
+                }
+
+                return render(request, 'core/my_questions.html', context)
+
+            except Professor.DoesNotExist:
+                return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
+            
+    except Users.DoesNotExist:
+        return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
+
+
+def questions_by_type(request, type):
+    # Check if the user is a professor
+    if hasattr(request.user, 'professor'):
+        # Get all questions of the specified type
+        questions = Question.objects.filter(type=type)
+        return render(request, 'questions_by_type.html', {'type': type, 'questions': questions})
+    else:
+        return render(request, '403.html')  # Return a 403 page if the user is not a professor
+
+
 def ask_server(request):
     username = request.session.get('username')
     Ra = request.session.get('Ra')

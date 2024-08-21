@@ -430,7 +430,9 @@ CREATE TABLE Questions (
     type VARCHAR(100) NOT NULL,
     difficulty INT NOT NULL,
     rightAnswer_id CHAR(36),
-    FOREIGN KEY (rightAnswer_id) REFERENCES Attributes(gid)
+    professor_id CHAR(36),
+    FOREIGN KEY (rightAnswer_id) REFERENCES Attributes(gid),
+    FOREIGN KEY (professor_id) REFERENCES Professors(gid)
 );
 
 CREATE TABLE tests_questions (

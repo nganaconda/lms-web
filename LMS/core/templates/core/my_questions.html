@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to AUEB LMS</title>
-    <link rel="stylesheet" href="/static/css/prof_portfolio_style.css">
+    <title>My Test Questions</title>
+    <link rel="stylesheet" href="/static/css/my_questions_style.css">
 </head>
 <body>
     <header>
@@ -32,32 +32,28 @@
             </nav>
         </aside>
         <main>
-            <section class="test-scores">
-                <h1>My Tests</h1>
+            <section class="question-types">
+                <h1>My Test Questions</h1>
                 <table>
                     <thead>
                         <tr>
-                            <th>Test Name</th>
-                            <th>Classgroup Average Score</th>
-                            <th>Date</th>
+                            <th>Questions Type</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for test in tests_info %}
+                        {% for type in question_types %}
                             <tr>
-                                <td><a href="/tests/{{ test.gid }}/">{{ test.name }}</a></td>
-                                <td>{{ test.average }}</td>
-                                <td>{{ test.date|date:"d/m/Y" }}</td>
+                                <td><a href="{% url 'questions_by_type' type %}">{{ type }}</a></td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3">No test scores available.</td>
+                                <td colspan="3">No test questions available.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </section>
-        </main> 
+        </main>        
     </div>
     <footer>
         <p>&copy; 2024 AUEB LMS</p>
