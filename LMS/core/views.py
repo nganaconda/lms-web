@@ -373,7 +373,7 @@ def my_test_questions(request):
                     'question_types': question_types
                 }
 
-                return render(request, 'core/my_questions.html', context)
+                return render(request, 'core/my_questions_types.html', context)
 
             except Professor.DoesNotExist:
                 return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
@@ -383,13 +383,46 @@ def my_test_questions(request):
 
 
 def questions_by_type(request, type):
-    # Check if the user is a professor
-    if hasattr(request.user, 'professor'):
-        # Get all questions of the specified type
-        questions = Question.objects.filter(type=type)
-        return render(request, 'questions_by_type.html', {'type': type, 'questions': questions})
-    else:
-        return render(request, '403.html')  # Return a 403 page if the user is not a professor
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        contextNow = {
+             'username': username
+        }
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+
+                questions = Question.objects.filter(type=type, professor=professor)
+
+                # Prepare a list of tests with their GIDs and names
+                questions_info = []
+                for question in questions:
+                    right_answer = question.rightAnswer.answer
+                    questions_info.append({
+                        'gid': question.gid,
+                        'question': question.question,
+                        'difficulty': question.difficulty,
+                        'rightanswer': right_answer
+                    })
+                
+                # Add the list to the context
+                contextNow['questions_info'] = questions_info
+
+                return render(request, 'core/questions_by_type.html', contextNow)
+
+            except Professor.DoesNotExist:
+                return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
+            
+    except Users.DoesNotExist:
+        return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
 
 
 def ask_server(request):
