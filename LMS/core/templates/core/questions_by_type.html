@@ -45,7 +45,7 @@
                     <tbody>
                         {% for question in questions_info %}
                             <tr>
-                                <td><a href="/questions/{{ question.gid }}/">{{ question.question }}</a></td>
+                                <td><a href="/questions/{{ question.type }}/{{ question.gid }}/">{{ question.question }}</a></td>
                                 <td>{{ question.rightanswer }}</td>
                                 <td>{{ question.difficulty }}</td>
                             </tr>

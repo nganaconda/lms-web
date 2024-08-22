@@ -410,6 +410,7 @@ def questions_by_type(request, type):
                         'gid': question.gid,
                         'question': question.question,
                         'difficulty': question.difficulty,
+                        'type': question.type,
                         'rightanswer': right_answer
                     })
                 
@@ -424,6 +425,44 @@ def questions_by_type(request, type):
     except Users.DoesNotExist:
         return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
 
+
+def question_analysis(request, type, question_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        # Retrieve the question using the provided GID
+        question = get_object_or_404(Question, gid=question_gid)
+        
+        # Get all answers (attributes) related to the question
+        attributes = question.attributes.all()
+        question_data = {
+            'question_text': question.question,
+            'difficulty': question.difficulty,
+            'rightanswer': question.rightAnswer.answer,
+            'attributes': []
+        }
+        
+        for attribute in attributes:            
+            question_data['attributes'].append({
+                'answer_text': attribute.answer
+            })
+                
+        context = {
+            'username': username,
+            'question_data': question_data
+        }
+        
+        return render(request, 'core/question_analysis.html', context)
+    
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
+    
 
 def ask_server(request):
     username = request.session.get('username')

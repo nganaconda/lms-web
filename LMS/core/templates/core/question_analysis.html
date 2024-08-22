@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Test Questions</title>
+    <link rel="stylesheet" href="/static/css/question_analysis_style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/portfolio/">My Tests</a></li>
+                    <li><a href="/questions/">My Test Questions</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <section class="question_attributes">
+                <h1>{{ question_data.question_text }}</h1>
+                <p>Difficulty: {{ question_data.difficulty }}</p>
+                <p>Correct answer: {{ question_data.rightanswer }}</p>                
+                <h2>Attributes</h2>
+                <ul>
+                    {% for attribute in question_data.attributes %}
+                        <input type="radio" disabled>
+                        <label>{{ attribute.answer_text }}</label>
+                    {% endfor %}
+                </ul>
+            </section>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
+</body>
+</html>
