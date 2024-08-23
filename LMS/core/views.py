@@ -347,6 +347,59 @@ def completed_test_view(request, test_gid):
         return redirect('error_page')  # Or handle as appropriate
 
 
+def test_view(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        # Retrieve the test using the provided GID
+        test = get_object_or_404(Test, gid=test_gid)
+        
+        # Get all the questions related to this completed test
+        test_questions = test.questions.all()
+        
+        # Prepare the data structure to be passed to the template
+        questions_info = []
+        
+        # Iterate through each question in the test
+        for question in test_questions:
+            # Get all answers (attributes) related to the question
+            attributes = question.attributes.all()
+            question_data = {
+                'question_text': question.question,
+                'attributes': []
+            }
+            original_question = Question.objects.get(question=question.question)
+            
+            for attribute in attributes:
+                # Find the selected answer and whether it was correct
+                rightAnswer = original_question.rightAnswer
+                
+                question_data['attributes'].append({
+                    'answer_text': attribute.answer,
+                    'rightAnswer': rightAnswer.answer
+                })
+            
+            questions_info.append(question_data)
+        
+        context = {
+            'username': username,
+            'test_name': test.test_name,
+            'createdAt': test.createdAt,
+            'questions_info': questions_info
+        }
+        
+        return render(request, 'core/test_analysis.html', context)
+    
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
+
+
 def my_test_questions(request):
     username = request.session.get('username')
 

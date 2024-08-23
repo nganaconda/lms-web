@@ -32,6 +32,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('delete_user/', views.delete_user_view, name='delete_user'),
     path('completed-test/<str:test_gid>/', views.completed_test_view, name='completed_test'),
+    path('tests/<str:test_gid>/', views.test_view, name='test'),
     path('questions/', views.my_test_questions, name='my_test_questions'),
     path('questions/<str:type>/', views.questions_by_type, name='questions_by_type'),
     path('questions/<str:type>/<str:question_gid>/', views.question_analysis, name='question_analysis'),
