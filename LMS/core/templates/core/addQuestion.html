@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add a Question</title>
+    <link rel="stylesheet" href="/static/css/addQuestion_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/portfolio/">My Tests</a></li>
+                    <li><a href="/questions/">My Test Questions</a></li>
+                    <!-- Dropdown list of tests -->
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <section class="add_question">
+                <h1>Add a Question</h1>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="question-details">
+                        {{ form.as_p }}
+                    </div>
+                    <div class="attributes-section">
+                        <h3>Attributes</h3>
+                        <div id="attribute-forms">
+                            {% for attribute_form in attribute_forms %}
+                                {{ attribute_form.as_p }}
+                            {% endfor %}
+                        </div>
+                        <button type="button" id="add-attribute" class="green-button"><i class="fas fa-plus"></i> Add Attribute</button>
+                    </div>
+                    <button type="submit" class="save-button">Save Question</button>
+                </form>
+            </section>
+        </main>        
+    </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
+
+    <script>
+        document.getElementById('add-attribute').addEventListener('click', function() {
+            const attributeForms = document.getElementById('attribute-forms');
+            const newFormIndex = attributeForms.children.length;
+            const newForm = document.createElement('div');
+            newForm.innerHTML = `
+                <div>
+                    <input type="text" name="attribute-${newFormIndex}" placeholder="Enter attribute text" required>
+                    <input type="checkbox" name="rightAnswer" value="${newFormIndex}">
+                    Correct Answer
+                </div>
+            `;
+            attributeForms.appendChild(newForm);
+        });
+    </script>
+    
+</body>
+</html>

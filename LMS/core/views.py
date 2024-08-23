@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
 from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
+from .forms import QuestionForm, AttributeForm
 
 User = get_user_model()
 class LoginAndRegister():
@@ -432,6 +433,54 @@ def my_test_questions(request):
                 return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
             
     except Users.DoesNotExist:
+        return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
+
+
+def addQuestion(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')
+
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+        
+            professor = Professor.objects.get(user=user)
+
+            if request.method == 'POST':
+                form = QuestionForm(request.POST)
+                attribute_forms = [AttributeForm(request.POST, prefix=str(i)) for i in range(len(request.POST.getlist('attributes')))]
+
+                if form.is_valid() and all([af.is_valid() for af in attribute_forms]):
+                    question = form.save(commit=False)
+                    question.professor = professor
+                    question.save()
+                    form.save_m2m()  # Save many-to-many data
+
+                    for af in attribute_forms:
+                        attribute = af.save()
+                        question.attributes.add(attribute)
+
+                    question.rightAnswer = request.POST.get('rightAnswer')
+                    question.save()
+                    return redirect('questions_by_type', type=question.type)
+
+            else:
+                form = QuestionForm()
+                attribute_forms = [AttributeForm(prefix=str(i)) for i in range(1)]
+
+            contextNow = {
+                'username': username,
+                'form': form,
+                'attribute_forms': attribute_forms
+            }
+
+            return render(request, 'core/addQuestion.html', contextNow)
+
+    except Professor.DoesNotExist:
         return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
 
 

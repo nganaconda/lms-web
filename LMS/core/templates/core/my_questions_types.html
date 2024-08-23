@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Test Questions</title>
     <link rel="stylesheet" href="/static/css/my_questions_types_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -32,6 +33,11 @@
             </nav>
         </aside>
         <main>
+            <div class="add-question-container">
+                <button class="add-question-button" onclick="location.href='/questions/add/'">
+                    <i class="fas fa-plus"></i> Add a question
+                </button>
+            </div>
             <section class="question-types">
                 <h1>My Test Questions</h1>
                 <table>

@@ -97,67 +97,51 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.add-question-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.add-question-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.add-question-button:hover {
-    background-color: #45a049;
-}
-
-.add-question-button i {
-    margin-right: 8px; /* Adds space between the icon and the label */
-}
-
-.question-types {
+.add_question {
     padding: 20px;
 }
 
-.question-types h1 {
+.add_question h1 {
     font-size: 24px;
     margin-bottom: 20px;
     border-bottom: 2px solid #333;
     padding-bottom: 10px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.attributes-section {
+    margin-top: 20px;
 }
 
-table th, table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+.green-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
-table th {
-    background-color: #f4f4f4;
+.green-button i {
+    margin-right: 8px;
 }
 
-table tr:hover {
-    background-color: #f9f9f9;
+.green-button:hover {
+    background-color: #218838;
 }
 
-table a {
-    color: rgba(152,143,138,1);
-    text-decoration: none;
+.save-button {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+    border-radius: 4px;
 }
 
-table a:hover {
-    text-decoration: underline;
+.save-button:hover {
+    background-color: #0056b3;
 }
 
 footer {
@@ -169,5 +153,3 @@ footer {
     bottom: 0;
     width: 100%;
 }
-
-
