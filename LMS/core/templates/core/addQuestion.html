@@ -35,21 +35,51 @@
         <main>
             <section class="add_question">
                 <h1>Add a Question</h1>
-                <form method="POST">
+                <form method="post">
                     {% csrf_token %}
-                    <div class="question-details">
-                        {{ form.as_p }}
+                    
+                    <div>
+                        <h2>Question Details</h2>
+                        {{ form.non_field_errors }}
+                        <div>
+                            <label for="id_question">Question:</label>
+                            {{ form.question }}
+                        </div>
+                        <div>
+                            <label for="id_type">Type:</label>
+                            {{ form.type }}
+                        </div>
+                        <div>
+                            <label for="id_difficulty">Difficulty:</label>
+                            {{ form.difficulty }}
+                        </div>
                     </div>
-                    <div class="attributes-section">
-                        <h3>Attributes</h3>
-                        <div id="attribute-forms">
-                            {% for attribute_form in attribute_forms %}
-                                {{ attribute_form.as_p }}
+                
+                    <div>
+                        <h2>Attributes</h2>
+                        {{ formset.management_form }}
+                        <div id="attributes-container">
+                            {% for subform in formset %}
+                                <div class="attribute-form">
+                                    {{ subform.non_field_errors }}
+                                    {{ subform.answer.label_tag }} {{ subform.answer }}
+                                    {% if subform.instance.pk %}
+                                        <label for="{{ subform.prefix }}-DELETE">Delete:</label>
+                                        {{ subform.DELETE }}
+                                    {% endif %}
+                                </div>
                             {% endfor %}
                         </div>
-                        <button type="button" id="add-attribute" class="green-button"><i class="fas fa-plus"></i> Add Attribute</button>
+                        <button type="button" id="add-attribute">Add Another Attribute</button>
                     </div>
-                    <button type="submit" class="save-button">Save Question</button>
+                
+                    <div>
+                        <h2>Right Answer</h2>
+                        <label for="id_rightAnswerText">Right Answer:</label>
+                        {{ form.rightAnswerText }}
+                    </div>
+                
+                    <button type="submit">Save Question</button>
                 </form>
             </section>
         </main>        
@@ -59,20 +89,38 @@
     </footer>
 
     <script>
-        document.getElementById('add-attribute').addEventListener('click', function() {
-            const attributeForms = document.getElementById('attribute-forms');
-            const newFormIndex = attributeForms.children.length;
-            const newForm = document.createElement('div');
-            newForm.innerHTML = `
-                <div>
-                    <input type="text" name="attribute-${newFormIndex}" placeholder="Enter attribute text" required>
-                    <input type="checkbox" name="rightAnswer" value="${newFormIndex}">
-                    Correct Answer
-                </div>
-            `;
-            attributeForms.appendChild(newForm);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to handle adding new attribute forms
+            document.getElementById('add-attribute').addEventListener('click', function() {
+                var container = document.getElementById('attributes-container');
+                var totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                var newForm = container.children[0].cloneNode(true);
+                var formCount = parseInt(totalForms.value);
+                totalForms.value = formCount + 1;
+                var regex = new RegExp(`form-(\\d+)-`, 'g');
+                newForm.innerHTML = newForm.innerHTML.replace(regex, `form-${formCount}-`);
+                container.appendChild(newForm);
+        
+                // Add event listener to the new delete checkbox
+                newForm.querySelector('.delete-attribute').addEventListener('change', function() {
+                    if (this.checked) {
+                        newForm.remove();
+                    }
+                });
+            });
+
+            // Function to handle the deletion of existing attribute forms
+            const attributesContainer = document.getElementById('attributes-container');
+
+            // Add event listener to existing delete checkboxes
+            attributesContainer.querySelectorAll('.delete-attribute').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        this.closest('.attribute-form').remove();
+                    }
+                });
+            });
         });
     </script>
-    
 </body>
 </html>

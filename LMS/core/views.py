@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
 from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
-from .forms import QuestionForm, AttributeForm
+from .forms import QuestionForm, AttributeFormSet
 
 User = get_user_model()
 class LoginAndRegister():
@@ -452,30 +452,36 @@ def addQuestion(request):
 
             if request.method == 'POST':
                 form = QuestionForm(request.POST)
-                attribute_forms = [AttributeForm(request.POST, prefix=str(i)) for i in range(len(request.POST.getlist('attributes')))]
+                formset = AttributeFormSet(request.POST, queryset=Attribute.objects.none())  # Start with an empty queryset
 
-                if form.is_valid() and all([af.is_valid() for af in attribute_forms]):
+                if form.is_valid() and formset.is_valid():
                     question = form.save(commit=False)
-                    question.professor = professor
+                    question.professor = professor  # Assign the logged-in professor
                     question.save()
-                    form.save_m2m()  # Save many-to-many data
 
-                    for af in attribute_forms:
-                        attribute = af.save()
-                        question.attributes.add(attribute)
+                    # Handle the right answer
+                    right_answer_text = form.cleaned_data['rightAnswerText']
+                    right_answer = Attribute.objects.create(answer=right_answer_text)
+                    question.rightAnswer = right_answer
+                    question.attributes.add(right_answer)
 
-                    question.rightAnswer = request.POST.get('rightAnswer')
+                    # Save each attribute and link it to the question
+                    for attribute_form in formset:
+                        if attribute_form.cleaned_data:
+                            attribute = attribute_form.save()
+                            question.attributes.add(attribute)
+
                     question.save()
                     return redirect('questions_by_type', type=question.type)
 
             else:
                 form = QuestionForm()
-                attribute_forms = [AttributeForm(prefix=str(i)) for i in range(1)]
+                formset = AttributeFormSet(queryset=Attribute.objects.none())  # Start with an empty queryset
 
             contextNow = {
                 'username': username,
                 'form': form,
-                'attribute_forms': attribute_forms
+                'formset': formset,
             }
 
             return render(request, 'core/addQuestion.html', contextNow)
