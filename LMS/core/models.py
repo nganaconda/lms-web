@@ -5,6 +5,8 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
 from django.db import models
 import uuid
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class UserAccountManager(BaseUserManager):
@@ -139,13 +141,17 @@ class Question(models.Model):
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
-    difficulty = models.IntegerField()
+    difficulty = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
     attributes = models.ManyToManyField('Attribute', related_name='questions')
     rightAnswer = models.ForeignKey(Attribute, on_delete=models.CASCADE)
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Question with id {self.gid} - Question: {self.question}, Tpye: {self.type}, Difficulty: {self.difficulty}"
+    
+    def clean(self):
+        if not (1 <= self.difficulty <= 4):
+            raise ValidationError('Difficulty must be between 1 and 4.')
     
 
 class CompletedTest(models.Model):

@@ -51,7 +51,7 @@
                         </div>
                         <div>
                             <label for="id_difficulty">Difficulty:</label>
-                            {{ form.difficulty }}
+                            <input type="number" id="id_difficulty" name="difficulty" min="1" max="4">
                         </div>
                     </div>
                 
@@ -61,12 +61,10 @@
                         <div id="attributes-container">
                             {% for subform in formset %}
                                 <div class="attribute-form">
-                                    {{ subform.non_field_errors }}
-                                    {{ subform.answer.label_tag }} {{ subform.answer }}
-                                    {% if subform.instance.pk %}
-                                        <label for="{{ subform.prefix }}-DELETE">Delete:</label>
-                                        {{ subform.DELETE }}
-                                    {% endif %}
+                                    <div class="attribute-input-container">
+                                        {{ subform.answer.label_tag }} {{ subform.answer }}
+                                        <button type="button" class="remove-attribute"><i class="fas fa-times"></i></button>
+                                    </div>
                                 </div>
                             {% endfor %}
                         </div>
@@ -90,7 +88,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Function to handle adding new attribute forms
+            // Handle adding new attribute forms
             document.getElementById('add-attribute').addEventListener('click', function() {
                 var container = document.getElementById('attributes-container');
                 var totalForms = document.getElementById('id_form-TOTAL_FORMS');
@@ -100,26 +98,29 @@
                 var regex = new RegExp(`form-(\\d+)-`, 'g');
                 newForm.innerHTML = newForm.innerHTML.replace(regex, `form-${formCount}-`);
                 container.appendChild(newForm);
-        
-                // Add event listener to the new delete checkbox
-                newForm.querySelector('.delete-attribute').addEventListener('change', function() {
-                    if (this.checked) {
-                        newForm.remove();
-                    }
-                });
+                
+                // Attach the event listener to the new "X" button
+                attachRemoveEvent(newForm.querySelector('.remove-attribute'));
             });
 
-            // Function to handle the deletion of existing attribute forms
-            const attributesContainer = document.getElementById('attributes-container');
+            // Attach remove event to existing forms
+            document.querySelectorAll('.remove-attribute').forEach(attachRemoveEvent);
 
-            // Add event listener to existing delete checkboxes
-            attributesContainer.querySelectorAll('.delete-attribute').forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        this.closest('.attribute-form').remove();
+            function attachRemoveEvent(button) {
+                button.addEventListener('click', function() {
+                    var container = document.getElementById('attributes-container');
+                    var form = this.parentElement;
+                    var totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                    var formCount = parseInt(totalForms.value);
+
+                    if (formCount > 1) {
+                        form.remove();
+                        totalForms.value = formCount - 1;
+                    } else {
+                        form.querySelector('input').value = ''; // Clear content if it's the only form
                     }
                 });
-            });
+            }
         });
     </script>
 </body>

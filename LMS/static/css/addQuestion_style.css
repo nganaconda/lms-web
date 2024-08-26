@@ -128,6 +128,7 @@ form label {
     display: block;
     margin-bottom: 5px;
     color: #555;
+    padding-right: 10px;
 }
 
 /* Input fields */
@@ -155,6 +156,43 @@ form select {
 
 #add-attribute:hover {
     background-color: #218838;
+}
+
+/* Flex container for attribute input and delete button */
+.attribute-input-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Make the input field take most of the space */
+.attribute-input-container input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Remove Attribute button */
+.remove-attribute {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-attribute:hover {
+    color: #bd2130;
+}
+
+.remove-attribute i {
+    pointer-events: none; /* Prevent click on icon inside button */
 }
 
 /* Submit button */

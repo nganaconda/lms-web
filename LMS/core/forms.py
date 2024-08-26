@@ -15,6 +15,12 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = ['question', 'type', 'difficulty']
 
+    def clean_difficulty(self):
+        difficulty = self.cleaned_data.get('difficulty')
+        if difficulty < 1 or difficulty > 4:
+            raise forms.ValidationError('Difficulty must be between 1 and 4.')
+        return difficulty
+
 
 # Attribute form for creating additional attributes
 class AttributeForm(forms.ModelForm):
