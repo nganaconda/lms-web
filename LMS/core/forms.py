@@ -1,5 +1,5 @@
 from django import forms
-from .models import Users, Question, Attribute
+from .models import Users, Question, Attribute, Test, ClassGroup
 from django.forms import ModelForm, modelformset_factory
 
 class UserModelForm(ModelForm):
@@ -36,3 +36,23 @@ AttributeFormSet = modelformset_factory(
     extra=1,  # Start with one empty form
     can_delete=True  # Allow deletion of attributes
 )
+
+
+class TestForm(forms.ModelForm):
+    classGroup = forms.ModelChoiceField(
+        queryset=ClassGroup.objects.none(), 
+        label="Class Group", 
+        required=True
+    )
+
+    class Meta:
+        model = Test
+        fields = ['test_name', 'level', 'age', 'type', 'questions_no', 'questions_dif', 'classGroup']
+
+    def __init__(self, *args, **kwargs):
+        professor = kwargs.pop('professor', None)
+        super(TestForm, self).__init__(*args, **kwargs)
+        
+        if professor:
+            self.fields['classGroup'].queryset = ClassGroup.objects.filter(professors=professor)
+            self.fields['classGroup'].widget = forms.Select(choices=[(group.gid, group.class_name) for group in self.fields['classGroup'].queryset])

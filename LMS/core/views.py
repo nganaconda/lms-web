@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
 from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
-from .forms import QuestionForm, AttributeFormSet
+from .forms import QuestionForm, AttributeFormSet, TestForm
 
 User = get_user_model()
 class LoginAndRegister():
@@ -175,7 +175,10 @@ def portfolio(request):
                          average_score += completed_test.score
                          no_of_scores += 1
                     
-                    average_score = average_score / no_of_scores
+                    if no_of_scores > 0:
+                        average_score = average_score / no_of_scores
+                    else: 
+                        average_score = 0
 
                     tests_info.append({
                          'gid': test.gid,
@@ -218,6 +221,44 @@ def portfolio(request):
 
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
+
+
+def addTest(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')
+
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+        
+            professor = Professor.objects.get(user=user)
+
+            if request.method == 'POST':
+                form = TestForm(request.POST, professor=professor)
+ 
+                if form.is_valid():
+                    test = form.save(commit=False)
+                    test.professor = professor  # Assign the logged-in professor
+                    test.save()
+
+                    return redirect('portfolio')
+
+            else:
+                form = TestForm(professor=professor)
+ 
+            contextNow = {
+                'username': username,
+                'form': form,
+            }
+
+            return render(request, 'core/addTest.html', contextNow)
+
+    except Professor.DoesNotExist:
+        return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
 
 
 def profile_view(request):
