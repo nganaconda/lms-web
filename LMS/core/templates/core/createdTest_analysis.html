@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ test_name }} - Test</title>
+    <link rel="stylesheet" href="/static/css/createdTest_analysis_style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/portfolio/">My Tests</a></li>
+                    <li><a href="/questions/">My Test Questions</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <div class="remake-container">
+                <a href="{% url 'remakeTest' test_gid=test_gid %}" class="remake-test-button">
+                    <i class="fas fa-sync"></i> Remake the test
+                </a>
+            </div>
+            <section class="test">
+                <h1>{{ test_name }}</h1>
+                <p>Created at: {{ createdAt|date:"d/m/Y" }}</p>
+                
+                {% for question in questions_info %}
+                    <div class="question">
+                        <h2>{{ question.question_text }}</h2>
+                        <ul>
+                            {% for attribute in question.attributes %}
+                                <li>
+                                    <input type="radio" disabled>
+                                    <label>{{ attribute.answer_text }}</label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </section>
+            <div class="submit-container">
+                <button class="submit-button" onclick="location.href='/portfolio/'">
+                    Save changes
+                </button>
+            </div>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
+</body>
+</html>

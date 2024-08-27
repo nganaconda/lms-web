@@ -36,38 +36,43 @@
                 <h1>Add a new Test</h1>
                 <form method="post">
                     {% csrf_token %}
-
-                    {{ form.non_field_errors }}
                     
                     <div>
                         <h2>Test Details</h2>
                         {{ form.non_field_errors }}
                         <div>
                             <label for="id_test_name">Test Name:</label>
+                            {{ form.test_name.errors }}
                             {{ form.test_name }}
                         </div>
                         <div>
                             <label for="id_level">Level:</label>
+                            {{ form.level.errors }}
                             {{ form.level }}
                         </div>
                         <div>
                             <label for="id_age">Age:</label>
+                            {{ form.age.errors }}
                             {{ form.age }}
                         </div>
                         <div>
                             <label for="id_type">Type:</label>
+                            {{ form.type.errors }}
                             {{ form.type }}
                         </div>
                         <div>
                             <label for="id_questions_no">Number of Questions:</label>
+                            {{ form.questions_no.errors }}
                             {{ form.questions_no }}
                         </div>
                         <div>
                             <label for="id_questions_dif">Difficulty:</label>
+                            {{ form.questions_dif.errors }}
                             {{ form.questions_dif }}
                         </div>
                         <div>
                             <label for="id_classGroup">Class Group:</label>
+                            {{ form.classGroup.errors }}
                             {{ form.classGroup }}
                         </div>
                     </div>

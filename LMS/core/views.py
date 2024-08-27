@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render,redirect
 from django.contrib import messages
+from django import forms
 import logging
 from django.http import HttpResponse
 from .models import Users
@@ -26,6 +27,7 @@ from django.contrib.auth import get_user_model
 import uuid
 from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
 from .forms import QuestionForm, AttributeFormSet, TestForm
+import random
 
 User = get_user_model()
 class LoginAndRegister():
@@ -245,7 +247,43 @@ def addTest(request):
                     test.professor = professor  # Assign the logged-in professor
                     test.save()
 
-                    return redirect('portfolio')
+                    # Retrieve the test criteria
+                    test_type = test.type
+                    test_difficulty = test.questions_dif
+                    questions_required = test.questions_no
+
+                    # Check if there are questions of the specified type
+                    type_questions = Question.objects.filter(
+                        type=test_type,
+                        professor=professor
+                    )
+                    if type_questions.count() == 0:
+                        test.delete()
+                        # Add an error to the form's questions_no field
+                        form.add_error('type', forms.ValidationError(
+                            f'There are no questions available of type "{test_type}".'
+                        ))
+                    else:
+                        # Query for questions that match the criteria
+                        matching_questions = Question.objects.filter(
+                            type=test_type,
+                            difficulty=test_difficulty,
+                            professor=professor
+                        )
+
+                        # Check if enough questions are available
+                        if matching_questions.count() >= questions_required:
+                            # Randomly select the required number of questions
+                            selected_questions = random.sample(list(matching_questions), questions_required)
+                            test.questions.set(selected_questions)  # Assign questions to the test
+                            test.save()
+                            return redirect('viewCreated', test_gid=test.gid)  # Redirect to test view
+                        else:
+                            test.delete()
+                            # Add an error to the form's questions_no field
+                            form.add_error('questions_no', forms.ValidationError(
+                                f'Not enough questions available of type "{test_type}" and difficulty "{test_difficulty}".'
+                            ))
 
             else:
                 form = TestForm(professor=professor)
@@ -259,6 +297,51 @@ def addTest(request):
 
     except Professor.DoesNotExist:
         return redirect(request, '403.html')  # Return a 403 page if the user is not a professor
+
+
+def remakeTest(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')
+
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:
+            professor = Professor.objects.get(user=user)
+
+            # Retrieve the existing test
+            test = get_object_or_404(Test, gid=test_gid)
+            
+            # Retrieve the test criteria
+            test_type = test.type
+            test_difficulty = test.questions_dif
+            questions_required = test.questions_no
+
+            # Delete the existing test
+            test.questions.clear()
+
+            # Query for questions that match the criteria
+            matching_questions = Question.objects.filter(
+                type=test_type,
+                difficulty=test_difficulty,
+                professor=professor
+            )
+
+            # Randomly select the required number of questions
+            selected_questions = random.sample(list(matching_questions), questions_required)
+            
+            # Update the test with new questions
+            test.questions.set(selected_questions)
+            test.save()
+            
+            # Redirect to the updated test analysis view
+            return redirect('viewCreated', test_gid=test.gid)
+
+    except Professor.DoesNotExist:
+        return redirect('403')
 
 
 def profile_view(request):
@@ -440,6 +523,61 @@ def test_view(request, test_gid):
     
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
+    
+
+def viewCreated(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        # Retrieve the test using the provided GID
+        test = get_object_or_404(Test, gid=test_gid)
+        
+        # Get all the questions related to this completed test
+        test_questions = test.questions.all()
+        
+        # Prepare the data structure to be passed to the template
+        questions_info = []
+        
+        # Iterate through each question in the test
+        for question in test_questions:
+            # Get all answers (attributes) related to the question
+            attributes = question.attributes.all()
+            question_data = {
+                'question_text': question.question,
+                'attributes': []
+            }
+            original_question = Question.objects.get(question=question.question)
+            
+            for attribute in attributes:
+                # Find the selected answer and whether it was correct
+                rightAnswer = original_question.rightAnswer
+                
+                question_data['attributes'].append({
+                    'answer_text': attribute.answer,
+                    'rightAnswer': rightAnswer.answer
+                })
+            
+            questions_info.append(question_data)
+        
+        context = {
+            'username': username,
+            'test_name': test.test_name,
+            'createdAt': test.createdAt,
+            'questions_info': questions_info,
+            'test_gid': test.gid
+        }
+        
+        return render(request, 'core/createdTest_analysis.html', context)
+    
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
+
 
 
 def my_test_questions(request):
