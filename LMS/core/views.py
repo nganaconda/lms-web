@@ -799,7 +799,94 @@ def question_analysis(request, type, question_gid):
     
     except Users.DoesNotExist:
         return redirect('403.html')  # Or handle as appropriate
-    
+
+
+def completeTest(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')
+
+    try:
+        user = Users.objects.get(username=username)
+        student = Student.objects.get(user=user)
+
+        # Fetch the test using the provided gid
+        test = get_object_or_404(Test, gid=test_gid)
+
+        # Fetch the questions related to the test
+        questions = test.questions.all()
+
+        context = {
+            'username': username,
+            'test': test,
+            'questions': questions,
+        }
+
+        return render(request, 'core/completeTest.html', context)
+
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
+    except Student.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
+
+
+def submitTest(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')
+
+    try:
+        user = Users.objects.get(username=username)
+        student = Student.objects.get(user=user)
+
+        test = get_object_or_404(Test, gid=test_gid)
+
+        if request.method == 'POST':
+            score = 0
+            questions = test.questions.all()
+            total_questions = len(questions)
+
+            # Create a CompletedTest record
+            completedTest = CompletedTest.objects.create(
+                test=test,
+                student=student,
+                score=score
+            )
+
+            for question in questions:
+
+                selected_answer_gid = request.POST.get(str(question.gid))
+                if selected_answer_gid:
+                    selected_answer = Attribute.objects.get(gid=selected_answer_gid)
+                    
+                    completedTestAnswer = CompletedTestAnswer.objects.create(
+                    question=question,
+                    completedTest=completedTest,
+                    is_correct=False,
+                    attribute=selected_answer
+                    )
+
+                    if selected_answer == question.rightAnswer:
+                        score += 1
+                        completedTestAnswer.is_correct=True
+                        completedTestAnswer.save()
+            
+            # Calculate the score as a percentage
+            score_percentage = (score / total_questions) * 10
+
+            completedTest.score = score_percentage
+            completedTest.save()
+            
+            messages.success(request, f'Test completed successfully! Your score: {score_percentage}%')
+            return redirect('newTests')
+
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
+    except Student.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
+
 
 def ask_server(request):
     username = request.session.get('username')
