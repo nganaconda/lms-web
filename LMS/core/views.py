@@ -223,6 +223,56 @@ def portfolio(request):
 
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
+    
+
+def newTests(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        contextNow = {
+             'username': username
+        }
+
+        if not user.is_admin:
+            try:
+                student = Student.objects.get(user=user)
+
+                classGroup = ClassGroup.objects.filter(students=student).first()
+
+                # Retrieve all Test objects associated with this student
+                allStudentTests = Test.objects.filter(classGroup=classGroup)
+                allStudentCompletedTests = CompletedTest.objects.filter(student=student).select_related('test').order_by('-test__createdAt')
+
+                tests_info = []
+                for test in allStudentTests:
+                    isCompleted = False
+
+                    for completedTest in allStudentCompletedTests:
+                        if test.gid == completedTest.test.gid:
+                            isCompleted = True
+                    
+                    if isCompleted == False:
+                        tests_info.append({
+                            'gid': test.gid,
+                            'name': test.test_name,
+                            'date': test.createdAt,
+                        })
+                
+                # Add the list to the context
+                contextNow['tests_info'] = tests_info
+
+                return render(request, 'core/newTests.html', contextNow)
+            except Student.DoesNotExist:
+                return redirect('403.html')  # Or handle as appropriate
+
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
 
 
 def addTest(request):

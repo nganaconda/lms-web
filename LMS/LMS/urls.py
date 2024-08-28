@@ -32,6 +32,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('tests/add/', views.addTest, name='addTest'),
     path('delete_user/', views.delete_user_view, name='delete_user'),
+    path('newTests/', views.newTests, name='newTests'),
     path('completed-test/<str:test_gid>/', views.completed_test_view, name='completed_test'),
     path('tests/view/<str:test_gid>/', views.test_view, name='test'),
     path('tests/viewCreated/<str:test_gid>/', views.viewCreated, name='viewCreated'),

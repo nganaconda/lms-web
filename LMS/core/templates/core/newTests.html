@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to AUEB LMS</title>
-    <link rel="stylesheet" href="/static/css/stu_portfolio_style.css">
+    <link rel="stylesheet" href="/static/css/newTests_style.css">
 </head>
 <body>
     <header>
@@ -31,26 +31,24 @@
             </nav>
         </aside>
         <main>
-            <section class="test-scores">
-                <h1>My Tests</h1>
+            <section class="newTests">
+                <h1>My New Tests</h1>
                 <table>
                     <thead>
                         <tr>
                             <th>Test Name</th>
-                            <th>Score</th>
                             <th>Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for test in tests_info %}
                             <tr>
-                                <td><a href="{% url 'completed_test' test.completed_test_gid %}">{{ test.name }}</a></td>
-                                <td>{{ test.score }}</td>
+                                <td><a href="{% url 'test' test.gid %}">{{ test.name }}</a></td>
                                 <td>{{ test.date|date:"d/m/Y" }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3">No test scores available.</td>
+                                <td colspan="3">No new tests available.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
