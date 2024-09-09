@@ -40,6 +40,7 @@ urlpatterns = [
     path('test/<uuid:test_gid>/', views.completeTest, name='completeTest'),
     path('test/<uuid:test_gid>/submit/', views.submitTest, name='submitTest'),
     path('grades/', views.viewGrades, name='viewGrades'),
+    path('professor-grades/', views.viewProfessorGrades, name='viewProfessorGrades'),
     path('questions/', views.my_test_questions, name='my_test_questions'),
     path('questions/view/<str:type>/', views.questions_by_type, name='questions_by_type'),
     path('questions/add/', views.addQuestion, name='addQuestion'),

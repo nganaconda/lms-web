@@ -964,6 +964,56 @@ def viewGrades(request):
         return redirect('403.html')  # Or handle as appropriate
 
 
+def viewProfessorGrades(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+
+                # Get all class groups the professor is responsible for
+                class_groups = professor.classGroups.all()
+
+                class_group_averages = []
+
+                for class_group in class_groups:
+                    # Fetch all tests created by the professor for this class group
+                    tests_in_class = Test.objects.filter(professor=professor, classGroup=class_group)
+                    # Find all completed tests for this class group
+                    completed_tests = CompletedTest.objects.filter(test__in=tests_in_class)
+                    
+                    if completed_tests.exists():
+                        # Calculate the average score for all tests in the class group (including failed ones)
+                        average_score = completed_tests.aggregate(Avg('score'))['score__avg']
+                    else:
+                        average_score = 0
+
+                    class_group_averages.append({
+                        'class_name': class_group.class_name,
+                        'average_score': round(average_score, 2),  # Rounding to 2 decimal places
+                    })
+
+                context = {
+                    'username': username,
+                    'class_group_averages': class_group_averages
+                }
+
+                return render(request, 'core/viewProfessorGrades.html', context)
+    
+            except Professor.DoesNotExist:
+                return redirect('403.html')  # Or handle as appropriate
+
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Handle non-existent user or redirect appropriately
+
+
 def ask_server(request):
     username = request.session.get('username')
     Ra = request.session.get('Ra')

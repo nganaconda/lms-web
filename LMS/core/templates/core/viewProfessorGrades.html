@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
-    <link rel="stylesheet" href="/static/css/profile_style.css">
+    <title>My Student Grades Overview</title>
+    <link rel="stylesheet" href="/static/css/prof_grades_style.css">
 </head>
 <body>
     <header>
@@ -32,22 +32,24 @@
             </nav>
         </aside>
         <main>
-            <section class="profile-header">
-                <h1>{{ full_name }}</h1>
-                <h2>{{ username }}</h2>
-            </section>
-            <section class="personal-info">
-                <h3>Personal Information</h3>
-                <p><strong>Email:</strong> {{ email }}</p>
-                <p><strong>Department:</strong> {{ department }}</p>
-            </section>
-            <section class="delete-user">
-                <form method="POST" action="{% url 'delete_user' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="delete-button">Delete Account</button>
-                </form>
-            </section>
-        </main>
+            <h1>Class Groups Overview</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Class Name</th>
+                        <th>Average Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for class_group in class_group_averages %}
+                    <tr>
+                        <td><a href="#">{{ class_group.class_name }}</a></td>
+                        <td>{{ class_group.average_score }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </main> 
     </div>
     <footer>
         <p>&copy; 2024 AUEB LMS</p>
