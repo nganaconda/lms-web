@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.db import connection
+from django.db.models import Avg
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render,redirect
@@ -28,6 +29,8 @@ import uuid
 from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
 from .forms import QuestionForm, AttributeFormSet, TestForm
 import random
+import math
+
 
 User = get_user_model()
 class LoginAndRegister():
@@ -199,7 +202,7 @@ def portfolio(request):
             try:
                 student = Student.objects.get(user=user)
 
-                # Retrieve all TestScore objects associated with this student
+                # Retrieve all CompletedTest objects associated with this student
                 completed_tests = CompletedTest.objects.filter(student=student).select_related('test').order_by('-test__createdAt')
 
                 # Prepare a list of tests with their GIDs and names
@@ -417,30 +420,36 @@ def profile_view(request):
             try:
                 professor = Professor.objects.get(user=user)
                 department = professor.department
-                reg_number = ""  # Professors don't have a reg number, leave as empty
-                year = ""  # Professors don't have a year, leave as empty
+
+                contextNow = {
+                    'full_name': full_name,
+                    'username': username,
+                    'email': email,
+                    'department': department
+                }
+
+                return render(request, 'core/prof_profile.html', contextNow)
+
             except Professor.DoesNotExist:
                 return redirect('error_page')  # Or handle as appropriate
         else:  # Non-admin users are students
             try:
                 student = Student.objects.get(user=user)
-                student = Student.objects.get(user=user)
                 reg_number = student.reg_number
                 year = student.year
-                department = ""  # Students don't have a department, leave as empty
+
+                contextNow = {
+                    'full_name': full_name,
+                    'username': username,
+                    'email': email,
+                    'reg_number': reg_number,
+                    'year': year,
+                }
+
+                return render(request, 'core/stud_profile.html', contextNow)
+
             except Student.DoesNotExist:
                 return redirect('error_page')  # Or handle as appropriate
-        
-        contextNow = {
-            'full_name': full_name,
-            'username': username,
-            'email': email,
-            'reg_number': reg_number,
-            'department': department,
-            'year': year,
-        }
-
-        return render(request, 'core/profile.html', contextNow)
     
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
@@ -885,6 +894,73 @@ def submitTest(request, test_gid):
     except Users.DoesNotExist:
         return redirect('403.html')  # Or handle as appropriate
     except Student.DoesNotExist:
+        return redirect('403.html')  # Or handle as appropriate
+    
+
+def viewGrades(request):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        contextNow = {
+             'username': username
+        }
+
+        username = user.username
+
+        if not user.is_admin:  # Assuming `is_admin` is False for students
+            try:
+                student = Student.objects.get(user=user)
+
+                # Retrieve all completed tests for the student
+                completed_tests = CompletedTest.objects.filter(student=student)
+
+                # Filter out the tests that are passed (scores >= 5)
+                passing_tests = completed_tests.filter(score__gte=5)
+
+                # Calculate the overall average score (considering only passing scores)
+                if passing_tests.exists():
+                    overall_average = passing_tests.aggregate(Avg('score'))['score__avg']
+                    # Round to 2 decimal places and use ceil to always round up
+                    overall_average = math.ceil(overall_average * 100) / 100
+                else:
+                    overall_average = 0
+
+                # Calculate the average scores by test type (for passing scores only)
+                test_types = Test.objects.values_list('type', flat=True).distinct()
+                type_averages = []
+                
+                for test_type in test_types:
+                    # Get passing tests of this type
+                    type_tests = passing_tests.filter(test__type=test_type)
+                    if type_tests.exists():
+                        avg_score = type_tests.aggregate(Avg('score'))['score__avg']
+                        # Round the average score for each type
+                        avg_score = math.ceil(avg_score * 100) / 100
+                        type_averages.append({
+                            'type': test_type,
+                            'average_score': avg_score,
+                            'tests': type_tests  # To show individual tests later
+                        })
+                        
+                        # Add the list to the context
+                        contextNow = {
+                            'username': username,
+                            'overall_average': overall_average,
+                            'type_averages': type_averages
+                        }
+
+                        return render(request, 'core/viewGrades.html', contextNow)
+
+            except Student.DoesNotExist:
+                return redirect('403.html')  # Or handle as appropriate
+    
+    except Users.DoesNotExist:
         return redirect('403.html')  # Or handle as appropriate
 
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/static/css/profile_style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/portfolio/">My Tests</a></li>
+                    <li><a href="/questions/">My Test Questions</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <section class="profile-header">
+                <h1>{{ full_name }}</h1>
+                <h2>{{ username }}</h2>
+            </section>
+            <section class="personal-info">
+                <h3>Personal Information</h3>
+                <p><strong>Email:</strong> {{ email }}</p>
+                <p><strong>Department:</strong> {{ department }}</p>
+            </section>
+            <section class="delete-user">
+                <form method="POST" action="{% url 'delete_user' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-button">Delete Account</button>
+                </form>
+            </section>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
+</body>
+</html>

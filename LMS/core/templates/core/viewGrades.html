@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Grades</title>
+    <link rel="stylesheet" href="/static/css/grades_style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <button class="home-button" onclick="location.href='/portfolio/'">
+                <img src="/static/home.png" alt="Home">
+            </button>
+            <div class="header-right">
+                <button onclick="location.href='/profile/'">{{ username }}</button>
+                <button onclick="location.href='/'">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <aside>
+            <div class="logo-container">
+                <img src="/static/logo.png" alt="Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/portfolio/">My Test History</a></li>
+                    <li><a href="/newTests/">New Tests</a></li>
+                    <li><a href="/grades/">My Grades</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <section class="grades-overview">
+                <h1>My Grades</h1>
+                <div class="overall-average">
+                    <h2>Overall Average (Passing Scores Only):</h2>
+                    <p>{{ overall_average|default:"No scores available" }}</p>
+                </div>
+
+                <div class="grades-by-type">
+                    <h2>Grades by Test Type:</h2>
+                    <ul>
+                        {% for type_avg in type_averages %}
+                            <li>
+                                <button class="type-toggle" onclick="toggleTests('{{ type_avg.type }}')">{{ type_avg.type }} (Average: {{ type_avg.average_score|default:"N/A" }})</button>
+                                
+                                <ul id="{{ type_avg.type }}-tests" class="test-list" style="display:none;">
+                                    {% for test in type_avg.tests %}
+                                        <li>{{ test.test.test_name }} - Score: {{ test.score }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2024 AUEB LMS</p>
+    </footer>
+
+    <script>
+        function toggleTests(type) {
+            const list = document.getElementById(`${type}-tests`);
+            if (list.style.display === "none") {
+                list.style.display = "block";
+            } else {
+                list.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

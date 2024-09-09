@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    <link rel="stylesheet" href="/static/css/profile_style.css">
+    <link rel="stylesheet" href="/static/css/stud_profile_style.css">
 </head>
 <body>
     <header>
@@ -25,7 +25,9 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="/tests/">Tests</a></li>
+                    <li><a href="/portfolio/">My Test History</a></li>
+                    <li><a href="/newTests/">New Tests</a></li>
+                    <li><a href="/grades/">My Grades</a></li>
                 </ul>
             </nav>
         </aside>
@@ -37,15 +39,8 @@
             <section class="personal-info">
                 <h3>Personal Information</h3>
                 <p><strong>Email:</strong> {{ email }}</p>
-                {% if reg_number %}
                 <p><strong>Registration Number:</strong> {{ reg_number }}</p>
-                {% endif %}
-                {% if department %}
-                <p><strong>Department:</strong> {{ department }}</p>
-                {% endif %}
-                {% if year %}
                 <p><strong>Year:</strong> {{ year }}</p>
-                {% endif %}
             </section>
             <section class="delete-user">
                 <form method="POST" action="{% url 'delete_user' %}">
