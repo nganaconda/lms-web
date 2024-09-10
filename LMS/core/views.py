@@ -997,6 +997,7 @@ def viewProfessorGrades(request):
 
                     class_group_averages.append({
                         'class_name': class_group.class_name,
+                        'class_group_id': class_group.gid,
                         'average_score': round(average_score, 2),  # Rounding to 2 decimal places
                     })
 
@@ -1007,6 +1008,63 @@ def viewProfessorGrades(request):
 
                 return render(request, 'core/viewProfessorGrades.html', context)
     
+            except Professor.DoesNotExist:
+                return redirect('403.html')  # Or handle as appropriate
+
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Handle non-existent user or redirect appropriately
+
+
+def viewClassGroupTestTypeAverages(request, class_group_id):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+                class_group = ClassGroup.objects.get(gid=class_group_id)
+
+                # Check if the professor is responsible for the class group
+                if class_group not in professor.classGroups.all():
+                    return redirect('403.html')
+
+                # Fetch tests for the class group created by this professor
+                tests_in_class = Test.objects.filter(professor=professor, classGroup=class_group)
+
+                # Get the distinct test types
+                test_types = tests_in_class.values_list('type', flat=True).distinct()
+
+                test_type_averages = []
+                for test_type in test_types:
+                    # Fetch all tests of this type in the class group
+                    tests_of_type = tests_in_class.filter(type=test_type)
+                    # Find all completed tests of this type
+                    completed_tests = CompletedTest.objects.filter(test__in=tests_of_type)
+
+                    if completed_tests.exists():
+                        # Calculate the average score for this test type
+                        average_score = completed_tests.aggregate(Avg('score'))['score__avg']
+                    else:
+                        average_score = 0
+
+                    test_type_averages.append({
+                        'test_type': test_type,
+                        'average_score': round(average_score, 2),  # Rounding to 2 decimal places
+                    })
+
+                context = {
+                    'username': username,
+                    'class_group_name': class_group.class_name,
+                    'test_type_averages': test_type_averages
+                }
+
+                return render(request, 'core/viewClassGroupTestTypeAverages.html', context)
             except Professor.DoesNotExist:
                 return redirect('403.html')  # Or handle as appropriate
 
