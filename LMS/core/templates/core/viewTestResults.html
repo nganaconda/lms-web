@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Type Averages - {{ class_group_name }}</title>
-    <link rel="stylesheet" href="/static/css/viewClassGroupTestType_style.css">
+    <title>Test Scores - {{ class_group_name }} - {{ test_name }}</title>
+    <link rel="stylesheet" href="/static/css/viewTestResults_style.css">
 </head>
 <body>
     <header>
@@ -32,19 +32,25 @@
             </nav>
         </aside>
         <main>
-            <h1>Average Grades for {{ class_group_name }}</h1>
+            <h1>Results for {{ class_group_name }} - {{ test_name }}</h1>
             <table>
                 <thead>
                     <tr>
-                        <th>Test Type</th>
-                        <th>Average Score</th>
+                        <th>Student Name</th>
+                        <th>Registration Number</th>
+                        <th>Score</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for test_type in test_type_averages %}
+                    {% for result in test_results %}
                     <tr>
-                        <td><a href="/professor-grades/{{ class_group_id }}/{{test_type.test_type}}/">{{ test_type.test_type }}</a></td>
-                        <td>{{ test_type.average_score }}</td>
+                        <td>{{ result.student_name }}</td>
+                        <td>{{ result.reg_number }}</td>
+                        <td>{{ result.score }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No completed tests available.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

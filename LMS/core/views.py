@@ -1061,6 +1061,7 @@ def viewClassGroupTestTypeAverages(request, class_group_id):
                 context = {
                     'username': username,
                     'class_group_name': class_group.class_name,
+                    'class_group_id': class_group_id,
                     'test_type_averages': test_type_averages
                 }
 
@@ -1070,6 +1071,110 @@ def viewClassGroupTestTypeAverages(request, class_group_id):
 
     except Users.DoesNotExist:
         return redirect('403.html')  # Handle non-existent user or redirect appropriately
+
+
+def viewClassGroupTestAverages(request, class_group_id, type):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:  # Assuming `is_admin` is True for professors
+            try:
+                professor = Professor.objects.get(user=user)
+                class_group = ClassGroup.objects.get(gid=class_group_id)
+
+                # Check if the professor is responsible for the class group
+                if class_group not in professor.classGroups.all():
+                    return redirect('403.html')
+
+                # Fetch tests for the class group created by this professor and that are of this specific type
+                tests_in_class = Test.objects.filter(professor=professor, classGroup=class_group, type=type).order_by('-createdAt')
+
+                test_averages = []
+                for test in tests_in_class:
+                    # Find all completed tests
+                    completed_tests = CompletedTest.objects.filter(test=test)
+
+                    if completed_tests.exists():
+                        # Calculate the average score for this test type
+                        average_score = completed_tests.aggregate(Avg('score'))['score__avg']
+                    else:
+                        average_score = 0
+
+                    test_averages.append({
+                        'test_name': test.test_name,
+                        'test_gid': test.gid,
+                        'date': test.createdAt,
+                        'average_score': round(average_score, 2),  # Rounding to 2 decimal places
+                    })
+
+                context = {
+                    'username': username,
+                    'class_group_name': class_group.class_name,
+                    'class_group_gid': class_group_id,
+                    'test_type': type,
+                    'test_averages': test_averages
+                }
+
+                return render(request, 'core/viewClassGroupTestAverages.html', context)
+            except Professor.DoesNotExist:
+                return redirect('403.html')  # Or handle as appropriate
+
+    except Users.DoesNotExist:
+        return redirect('403.html')  # Handle non-existent user or redirect appropriately
+
+
+def viewTestResults(request, test_gid, class_group_id, type):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')
+
+    try:
+        # Retrieve the user object
+        user = Users.objects.get(username=username)
+
+        if user.is_admin:
+            try:
+                professor = Professor.objects.get(user=user)
+                class_group = ClassGroup.objects.get(gid=class_group_id)
+                test = Test.objects.get(gid=test_gid)
+
+                # Ensure the professor is responsible for the class group associated with the test
+                if test.professor != professor:
+                    return redirect('403.html')
+
+                # Fetch all completed tests for this test
+                completed_tests = CompletedTest.objects.filter(test=test).order_by('student__reg_number')
+
+                test_results = []
+                for completed_test in completed_tests:
+                    student = completed_test.student
+                    test_results.append({
+                        'student_name': f"{student.user.first_name} {student.user.last_name}",
+                        'reg_number': student.reg_number,
+                        'score': completed_test.score,
+                    })
+
+                context = {
+                    'username': username,
+                    'class_group_name': class_group.class_name,
+                    'class_group_gid': class_group_id,
+                    'test_name': test.test_name,
+                    'test_results': test_results
+                }
+
+                return render(request, 'core/viewTestResults.html', context)
+            except (Professor.DoesNotExist, Test.DoesNotExist):
+                return redirect('403.html')
+
+    except Users.DoesNotExist:
+        return redirect('403.html')
 
 
 def ask_server(request):
