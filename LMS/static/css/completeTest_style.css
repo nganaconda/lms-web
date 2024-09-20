@@ -110,6 +110,10 @@ main {
 
 .question h2 {
     font-size: 20px;
+}
+
+.question h3 {
+    font-size: 17px;
     margin-bottom: 10px;
 }
 

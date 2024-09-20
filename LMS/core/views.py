@@ -983,10 +983,40 @@ def completeTest(request, test_gid):
         # Fetch the questions related to the test
         questions = test.questions.all()
 
+        # Prepare the data structure to be passed to the template
+        questions_info = []
+        
+        # Iterate through each question in the test
+        for question in questions:
+            original_question = Question.objects.get(question=question.question)
+            testgid = str(test_gid).replace('-', '')
+            questiongid = str(original_question.gid).replace('-', '')
+
+            # Get all answers (attributes) related to the question
+            attributes = question.attributes.all()
+            question_data = {
+                'question_text': question.question,
+                'gid': question.gid,
+                'question_weight': get_test_question(testgid, questiongid),
+                'attributes': []
+            }
+            
+            for attribute in attributes:
+                # Find the selected answer and whether it was correct
+                rightAnswer = original_question.rightAnswer
+                
+                question_data['attributes'].append({
+                    'gid': attribute.gid,
+                    'answer_text': attribute.answer,
+                    'rightAnswer': rightAnswer.answer
+                })
+            
+            questions_info.append(question_data)
+
         context = {
             'username': username,
             'test': test,
-            'questions': questions,
+            'questions': questions_info,
         }
 
         return render(request, 'core/completeTest.html', context)

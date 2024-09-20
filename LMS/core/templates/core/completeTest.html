@@ -38,12 +38,13 @@
                     {% csrf_token %}
                     {% for question in questions %}
                         <div class="question">
-                            <h2>{{ question.question }}</h2>
+                            <h2>{{ question.question_text }}</h2>
+                            <h3>Weight (0-1): {{ question.question_weight }}</h3>
                             <ul>
-                                {% for attribute in question.attributes.all %}
+                                {% for attribute in question.attributes %}
                                     <li>
                                         <input type="radio" name="{{ question.gid }}" value="{{ attribute.gid }}" id="{{ attribute.gid }}">
-                                        <label for="{{ attribute.gid }}">{{ attribute.answer }}</label>
+                                        <label for="{{ attribute.gid }}">{{ attribute.answer_text }}</label>
                                     </li>
                                 {% endfor %}
                             </ul>
