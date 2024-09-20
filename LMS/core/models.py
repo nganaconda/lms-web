@@ -165,7 +165,7 @@ class CompletedTest(models.Model):
     student = models.ForeignKey(Student, related_name='completed_tests', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"TestScore {self.gid} - Result: {self.result}, Test: {self.test.gid}, Student: {self.student.gid}"
+        return f"CompletedTest {self.gid} - completion_date: {self.completion_date}, score: {self.score}, Student: {self.student.gid}"
     
 
 class CompletedTestAnswer(models.Model):
@@ -179,4 +179,17 @@ class CompletedTestAnswer(models.Model):
     completedTest = models.ForeignKey(CompletedTest, related_name='completed_test_answers', on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"TestScore {self.gid} - Result: {self.result}, Test: {self.test.gid}, Student: {self.student.gid}"
+        return f"CompletedTestAnswer {self.gid} - is_correct: {self.is_correct}, completedTest: {self.completedTest.gid}, attribute: {self.attribute.gid}"
+
+
+class TestQuestion(models.Model):
+    class Meta:
+        db_table = 'tests_questions'
+    
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    weight = models.FloatField()
+    question = models.ForeignKey(Question, related_name='test_questions', on_delete=models.CASCADE)
+    test = models.ForeignKey(Test, related_name='test_questions', on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"TestQuestion {self.gid} - weight: {self.weight}, question: {self.question.gid}, test: {self.test.gid}"

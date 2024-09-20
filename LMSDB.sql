@@ -438,6 +438,7 @@ CREATE TABLE Questions (
 CREATE TABLE tests_questions (
     test_id CHAR(36) NOT NULL,
     question_id CHAR(36) NOT NULL,
+    weight FLOAT NOT NULL,
     PRIMARY KEY (test_id, question_id),
     FOREIGN KEY (test_id) REFERENCES Tests(gid),
     FOREIGN KEY (question_id) REFERENCES Questions(gid)
