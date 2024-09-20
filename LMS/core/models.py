@@ -185,8 +185,7 @@ class CompletedTestAnswer(models.Model):
 class TestQuestion(models.Model):
     class Meta:
         db_table = 'tests_questions'
-    
-    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     weight = models.FloatField()
     question = models.ForeignKey(Question, related_name='test_questions', on_delete=models.CASCADE)
     test = models.ForeignKey(Test, related_name='test_questions', on_delete=models.CASCADE)

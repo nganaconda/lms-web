@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect
 from django.db import connection
+from django.db import transaction
 from django.db.models import Avg
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import render,redirect
@@ -26,10 +28,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
-from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup
+from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup, TestQuestion
 from .forms import QuestionForm, AttributeFormSet, TestForm
 import random
 import math
+import logging
 
 
 User = get_user_model()
@@ -328,6 +331,18 @@ def addTest(request):
                         if matching_questions.count() >= questions_required:
                             # Randomly select the required number of questions
                             selected_questions = random.sample(list(matching_questions), questions_required)
+                            
+                            # Calculate the weight for each question
+                            weight = round(1/questions_required, 2)
+
+                            # Save each question in the `TestQuestion` table with the assigned weight
+                            for question in selected_questions:
+                                TestQuestion.objects.create(
+                                    test=test,
+                                    question=question,
+                                    weight=weight
+                                )
+                            
                             test.questions.set(selected_questions)  # Assign questions to the test
                             test.save()
                             return redirect('viewCreated', test_gid=test.gid)  # Redirect to test view
@@ -386,8 +401,18 @@ def remakeTest(request, test_gid):
             # Randomly select the required number of questions
             selected_questions = random.sample(list(matching_questions), questions_required)
             
-            # Update the test with new questions
-            test.questions.set(selected_questions)
+            # Calculate the weight for each question
+            weight = round(1/questions_required, 2)
+
+            # Save each question in the `TestQuestion` table with the assigned weight
+            for question in selected_questions:
+                TestQuestion.objects.create(
+                    test=test,
+                    question=question,
+                    weight=weight
+                )
+            
+            test.questions.set(selected_questions)  # Assign questions to the test
             test.save()
             
             # Redirect to the updated test analysis view
@@ -584,7 +609,26 @@ def test_view(request, test_gid):
         return redirect('error_page')  # Or handle as appropriate
     
 
+def get_test_question(test_id, question_id):
+    try:
+        con = mysql.connector.connect(host="localhost", user="root", passwd="gate123@A", database="LMSDB")
+        cursor = con.cursor()
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT weight FROM tests_questions WHERE test_id=%s AND question_id=%s --', [test_id , question_id])
+            row = cursor.fetchone()
+            
+            if row is not None:
+                weight=row[0]
+                
+                return weight
+            return 1
+    except Exception as e:
+        print(f"Error executing raw SQL: {e}")
+        return None
+
+
 def viewCreated(request, test_gid):
+    logger = logging.getLogger('django')
     username = request.session.get('username')
 
     if not username:
@@ -605,13 +649,17 @@ def viewCreated(request, test_gid):
         
         # Iterate through each question in the test
         for question in test_questions:
+            original_question = Question.objects.get(question=question.question)
+            testgid = str(test_gid).replace('-', '')
+            questiongid = str(original_question.gid).replace('-', '')
+
             # Get all answers (attributes) related to the question
             attributes = question.attributes.all()
             question_data = {
                 'question_text': question.question,
+                'weight': get_test_question(testgid, questiongid),
                 'attributes': []
             }
-            original_question = Question.objects.get(question=question.question)
             
             for attribute in attributes:
                 # Find the selected answer and whether it was correct
@@ -637,6 +685,113 @@ def viewCreated(request, test_gid):
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
 
+
+@transaction.atomic
+def save_test_weights(request, test_gid):
+    username = request.session.get('username')
+
+    if not username:
+        return redirect('login')  # Assuming there's a login view
+    
+    try:
+        con = mysql.connector.connect(host="localhost", user="root", passwd="gate123@A", database="LMSDB")
+        cursor = con.cursor()
+
+        # Retrieve the user object from the Users model
+        user = Users.objects.get(username=username)
+    
+        if request.method == 'POST':
+            # Retrieve the test
+            test = get_object_or_404(Test, gid=test_gid)
+            
+            # Get all questions related to the test
+            #test_questions = TestQuestion.objects.filter(test=test)
+            test_questions = []
+
+            test_id = str(test_gid).replace('-', '')
+
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT * FROM tests_questions
+                    WHERE test_id = %s
+                """, [test_id])
+                rows = cursor.fetchall()
+                
+                if rows:
+                    for row in rows:
+                        test_question = TestQuestion(
+                            test_id=row[0],
+                            question_id=row[1],
+                            weight=row[2]
+                        
+                        )
+                        test_questions.append(test_question)
+            
+            # Retrieve the weights from the POST data
+            weights = request.POST.getlist('weights')
+            
+            # Ensure we have the same number of weights as there are questions
+            if len(weights) != len(test_questions):
+                return JsonResponse({'error': 'Mismatch between number of questions and weights.'}, status=400)
+
+            # Sum the weights and validate
+            total_weight = sum([float(w) for w in weights if w])
+            if round(total_weight, 2) != 1.00:
+
+                questions_info = []
+            
+                # Iterate through each question in the test
+                for question in test_questions:
+                    original_question = Question.objects.get(question=question.question)
+                    testgid = str(test_gid).replace('-', '')
+                    questiongid = str(original_question.gid).replace('-', '')
+
+                    # Get all answers (attributes) related to the question
+                    attributes = question.attributes.all()
+                    question_data = {
+                        'question_text': question.question,
+                        'weight': get_test_question(testgid, questiongid),
+                        'attributes': []
+                    }
+                    
+                    for attribute in attributes:
+                        # Find the selected answer and whether it was correct
+                        rightAnswer = original_question.rightAnswer
+                        
+                        question_data['attributes'].append({
+                            'answer_text': attribute.answer,
+                            'rightAnswer': rightAnswer.answer
+                        })
+                    
+                    questions_info.append(question_data)
+                
+                context = {
+                    'username': username,
+                    'test_name': test.test_name,
+                    'createdAt': test.createdAt,
+                    'questions_info': questions_info,
+                    'test_gid': test.gid,
+                    'error_message': 'The total weight must equal 1. Please correct the values.'
+                }
+
+                return render(request, 'core/createdTest_analysis.html', context)
+            
+            # Update the weights in the database
+            for i, test_question in enumerate(test_questions):
+                                
+                with connection.cursor() as cursor:
+                    cursor.execute("""
+                        UPDATE tests_questions SET weight = %s
+                        WHERE test_id = %s and question_id = %s
+                    """, [weights[i], test_id, str(test_question.question_id).replace('-', '')])
+            
+            # Redirect to the same page or wherever appropriate after successful save
+            return redirect('portfolio')
+        
+        return redirect('viewCreated', test_gid=test_gid)
+    
+    except Users.DoesNotExist:
+        return redirect('error_page')  # Or handle as appropriate
 
 
 def my_test_questions(request):

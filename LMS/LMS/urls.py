@@ -37,6 +37,7 @@ urlpatterns = [
     path('tests/view/<str:test_gid>/', views.test_view, name='test'),
     path('tests/viewCreated/<str:test_gid>/', views.viewCreated, name='viewCreated'),
     path('tests/remake/<str:test_gid>/', views.remakeTest, name='remakeTest'),
+    path('tests/saveTestWeights/<str:test_gid>/', views.save_test_weights, name='save_test_weights'),
     path('test/<uuid:test_gid>/', views.completeTest, name='completeTest'),
     path('test/<uuid:test_gid>/submit/', views.submitTest, name='submitTest'),
     path('grades/', views.viewGrades, name='viewGrades'),
