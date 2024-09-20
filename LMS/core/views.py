@@ -134,9 +134,14 @@ class LoginAndRegister():
             last_name = request.POST.get('last_name')
             email = request.POST.get('email')
             password = request.POST.get('password')
+            repassword = request.POST.get('re-password')
 
-            if not (username and first_name and last_name and email and password):
+            if not (username and first_name and last_name and email and password and repassword):
                 messages.error(request, 'Please fill in all fields.')
+                return redirect('register')
+            
+            if password != repassword:
+                messages.error(request, 'The password and re-entered password are not the same.')
                 return redirect('register')
 
             user = Users(username=username, first_name=first_name, last_name=last_name, email=email)
