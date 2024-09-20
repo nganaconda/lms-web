@@ -39,6 +39,7 @@
                 {% for question in questions_info %}
                     <div class="question">
                         <h2>{{ question.question_text }}</h2>
+                        <h3>Weight (0-1): {{ question.question_weight }}</h2>
                         <ul>
                             {% for attribute in question.attributes %}
                                 <li>

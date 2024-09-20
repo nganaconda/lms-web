@@ -581,6 +581,7 @@ def test_view(request, test_gid):
             attributes = question.attributes.all()
             question_data = {
                 'question_text': question.question,
+                'question_weight': get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', '')),
                 'attributes': []
             }
             original_question = Question.objects.get(question=question.question)
