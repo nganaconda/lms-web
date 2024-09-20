@@ -1065,12 +1065,13 @@ def submitTest(request, test_gid):
                     )
 
                     if selected_answer == question.rightAnswer:
-                        score += 1
+                        weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
+                        score += weight
                         completedTestAnswer.is_correct=True
                         completedTestAnswer.save()
             
             # Calculate the score as a percentage
-            score_percentage = (score / total_questions) * 10
+            score_percentage = score * 10
 
             completedTest.score = score_percentage
             completedTest.save()
