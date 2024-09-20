@@ -40,6 +40,7 @@
                 {% for question in questions_info %}
                     <div class="question">
                         <h2>{{ question.question_text }}</h2>
+                        <h3>Weight (0-1): {{ question.question_weight }}</h3>
                         <ul>
                             {% for attribute in question.attributes %}
                                 <li class="{% if attribute.answer_text == attribute.rightAnswer %}correct{% endif %} {% if attribute.is_selected and not attribute.is_correct %}incorrect{% endif %}">
