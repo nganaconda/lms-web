@@ -33,6 +33,7 @@ from .forms import QuestionForm, AttributeFormSet, TestForm
 import random
 import math
 import logging
+from datetime import datetime
 
 
 User = get_user_model()
@@ -125,14 +126,27 @@ class LoginAndRegister():
     def register(request):
         if request.method == "POST":
             username = request.POST.get('username')
+            email = request.POST.get('email')
+            role = request.POST.get('role')  # Get the user role (student or professor)
 
             if Users.objects.filter(username=username).exists():
                 messages.error(request, 'Username already exists.')
                 return redirect('register')
+            if Users.objects.filter(email=email).exists():
+                messages.error(request, 'Email is already used.')
+                return redirect('register')
+            
+            # Check if the professor_id is present when the role is professor
+            professor_id = request.POST.get('professor_id') if role == 'professor' else None
+            department = request.POST.get('department') if role == 'professor' else None
+            
+            if role == 'professor':
+                if Professor.objects.filter(professorID=professor_id).exists():
+                    messages.error(request, 'Professor ID already exists.')
+                    return redirect('register')
 
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
-            email = request.POST.get('email')
             password = request.POST.get('password')
             repassword = request.POST.get('re-password')
 
@@ -143,16 +157,44 @@ class LoginAndRegister():
             if password != repassword:
                 messages.error(request, 'The password and re-entered password are not the same.')
                 return redirect('register')
+            
+            # Ensure professor_id is provided if the role is professor
+            if role == 'professor' and not professor_id:
+                messages.error(request, 'Professor ID is required for professors.')
+                return redirect('register')
 
             user = Users(username=username, first_name=first_name, last_name=last_name, email=email)
             user.set_password(password)
+            
             user.save()
+
+            if role == 'professor':
+                user.is_admin = True
+                Professor.objects.create(
+                    professorID = professor_id,
+                    department = department,
+                    user = user
+                )
+            elif role == 'student':
+                Student.objects.create(
+                    reg_number = StudentRegistry.generate_reg_number(),
+                    year = datetime.now().year,
+                    user = user
+                )
 
             messages.success(request, 'Registration is done. Please go to the login page.')
             return redirect('login')
         
         return render(request, 'core/registration.html')
 
+class StudentRegistry:
+    counter = 3000000  # Starting value for the global counter
+
+    @classmethod
+    def generate_reg_number(cls):
+        reg_number = f"f{cls.counter:07d}"  # Format to "fXXXXXXX" with leading zeros
+        cls.counter += 1  # Increment the counter for the next call
+        return reg_number
 
 def generate_nonce(length):
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(length))

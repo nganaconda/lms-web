@@ -57,6 +57,81 @@
         .alert {
             text-align: center;
         }
+
+        .professor-id {
+            display: none;
+        }
+
+        .department {
+            display: none;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;  /* This aligns items vertically in the center */
+            gap: 10px;  /* Adds space between the switch and the text */
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;  /* Smaller width */
+            height: 20px; /* Smaller height */
+            margin-top: 10px; /* Adjust this value to move the switch downward */
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px; /* Adjust to match the height */
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;   /* Smaller circle */
+            width: 16px;    /* Smaller circle */
+            left: 2px;      /* Adjust position */
+            bottom: 2px;    /* Adjust position */
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        /* When the switch is checked (professor mode) */
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px); /* Adjust for the smaller size */
+        }
+
+        /* Add focus outline for accessibility */
+        input:focus + .slider {
+            box-shadow: 0 0 1px #007bff;
+        }
+
+        /* Optional styling for a rounded switch */
+        .slider.round {
+            border-radius: 20px; /* Match with switch height */
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -75,8 +150,19 @@
             <h1>Registration Form</h1>
         </div>
 
-        <form action="{% url 'register' %}" method="POST">
+        <form id="registration-form" action="{% url 'register' %}" method="POST">
             {% csrf_token %}
+
+            <!-- Role Switch -->
+            <div class="role-switch">
+                <label for="role-switch">Register as:</label>
+                <label class="switch">
+                    <input type="checkbox" id="role-switch">
+                    <span class="slider round"></span>
+                </label>
+                <span id="role-label">Student</span>
+                <input type="hidden" id="role-input" name="role" value="student">
+            </div>
 
             <div class="form-group">
                 <label for="username">Username</label>
@@ -109,6 +195,17 @@
                 <input type="password" class="form-control" id="re-password" name="re-password" placeholder="Re-enter your password" required>
             </div>
 
+            <!-- Professor ID (Hidden by default) -->
+            <div class="form-group professor-id">
+                <label for="professor-id">Professor ID</label>
+                <input type="text" class="form-control" id="professor-id" name="professor_id" placeholder="Enter your professor ID">
+            </div>
+
+            <div class="form-group department">
+                <label for="department">Department</label>
+                <input type="text" class="form-control" id="department" name="department" placeholder="Enter your Department">
+            </div>
+            
             <button type="submit" class="btn btn-primary btn-register">Register</button>
         </form>
 
@@ -123,6 +220,38 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js" integrity="sha384-CDYR2ih3kNSoQPqJ/gK2G5dsiYEUHME/5vjS6v4tV8T1IfrAlZJG+1c+qr5i69WT" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh/jkKZ5Vz5u2rbKiq5Fd4tgCvsw2Kkwwsxc/" crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript for role switching -->
+    <script>
+        document.getElementById('role-switch').addEventListener('change', function () {
+            var professorIdField = document.querySelector('.professor-id');
+            var departmentField = document.querySelector('.department');
+            var roleLabel = document.getElementById('role-label');
+            var roleInput = document.getElementById('role-input');
+
+            if (this.checked) {
+                roleLabel.textContent = 'Professor';
+                professorIdField.style.display = 'block';
+                roleInput.value = 'professor';
+                document.getElementById('professor-id').setAttribute('required', 'required');
+
+                roleLabel.textContent = 'Professor';
+                departmentField.style.display = 'block';
+                roleInput.value = 'professor';
+                document.getElementById('department').setAttribute('required', 'required');
+            } else {
+                roleLabel.textContent = 'Student';
+                professorIdField.style.display = 'none';
+                roleInput.value = 'student';
+                document.getElementById('professor-id').removeAttribute('required');
+
+                roleLabel.textContent = 'Student';
+                departmentField.style.display = 'none';
+                roleInput.value = 'student';
+                document.getElementById('department').removeAttribute('required');
+            }
+        });
+    </script>
 
 </body>
 </html>
