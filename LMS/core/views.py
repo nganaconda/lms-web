@@ -170,6 +170,7 @@ class LoginAndRegister():
 
             if role == 'professor':
                 user.is_admin = True
+                user.save()
                 Professor.objects.create(
                     professorID = professor_id,
                     department = department,
@@ -536,6 +537,19 @@ def delete_user_view(request):
     try:
         # Retrieve the user object from the Users model
         user = Users.objects.get(username=username)
+
+        if user.is_admin:
+            try: 
+                professor = Professor.objects.get(user=user)
+                professor.delete()
+            except Professor.DoesNotExist:
+                return redirect('error pages')
+        else:
+            try: 
+                student = Student.objects.get(user=user)
+                student.delete()
+            except Student.DoesNotExist:
+                return redirect('error pages')
 
         user.delete()
         return redirect('login')  # Redirect to login page after deletion

@@ -372,6 +372,7 @@ CREATE TABLE Professors (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     department VARCHAR(100) NOT NULL,
     user_id CHAR(36) NOT NULL,
+    professorID VARCHAR(50) NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES Users(gid)
 );
 
