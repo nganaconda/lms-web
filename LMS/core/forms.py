@@ -54,5 +54,5 @@ class TestForm(forms.ModelForm):
         super(TestForm, self).__init__(*args, **kwargs)
         
         if professor:
-            self.fields['classGroup'].queryset = ClassGroup.objects.filter(professors=professor)
+            self.fields['classGroup'].queryset = ClassGroup.objects.filter(professors=professor).order_by('class_name')
             self.fields['classGroup'].widget = forms.Select(choices=[(group.gid, group.class_name) for group in self.fields['classGroup'].queryset])
