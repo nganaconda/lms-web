@@ -498,7 +498,8 @@ def profile_view(request):
                     'full_name': full_name,
                     'username': username,
                     'email': email,
-                    'department': department
+                    'department': department,
+                    'professorID': professor.professorID
                 }
 
                 return render(request, 'core/prof_profile.html', contextNow)
