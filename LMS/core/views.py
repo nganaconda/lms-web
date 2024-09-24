@@ -188,6 +188,7 @@ class LoginAndRegister():
         
         return render(request, 'core/registration.html')
 
+
 class StudentRegistry:
     counter = 3000000  # Starting value for the global counter
 
@@ -195,7 +196,20 @@ class StudentRegistry:
     def generate_reg_number(cls):
         reg_number = f"f{cls.counter:07d}"  # Format to "fXXXXXXX" with leading zeros
         cls.counter += 1  # Increment the counter for the next call
+
+        
+        if Student.objects.filter(reg_number=reg_number).exists():
+            students = Student.objects.all()
+            current_reg = 0
+
+            if students:
+                for student in students:
+                    if int(student.reg_number.replace('f', '')) > current_reg:
+                        current_reg = int(student.reg_number.replace('f', ''))
+                reg_number = 'f' + str(current_reg + 1)
+        
         return reg_number
+
 
 def generate_nonce(length):
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(length))
