@@ -429,6 +429,7 @@ CREATE TABLE Questions (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     question VARCHAR(100) NOT NULL,
     type VARCHAR(100) NOT NULL,
+    answerType VARCHAR(20) DEFAULT 'Single Choice' NOT NULL,
     difficulty INT NOT NULL,
     rightAnswer_id CHAR(36),
     professor_id CHAR(36),

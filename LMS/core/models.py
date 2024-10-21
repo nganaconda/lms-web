@@ -138,6 +138,17 @@ class Attribute(models.Model):
 class Question(models.Model):
     class Meta:
         db_table = 'Questions'
+
+    SINGLE_CHOICE = 'Single Choice'
+    MULTIPLE_CHOICE = 'Multiple Choice'
+    TEXT = 'Text'
+    PICK = 'Pick'
+    
+    ANSWER_TYPE_CHOICES = [
+        (SINGLE_CHOICE, 'Single Choice'),
+        (TEXT, 'Text'),
+        (PICK, 'Pick'),
+    ]
     
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.CharField(max_length=100)
@@ -146,6 +157,12 @@ class Question(models.Model):
     attributes = models.ManyToManyField('Attribute', related_name='questions')
     rightAnswer = models.ForeignKey(Attribute, on_delete=models.CASCADE)
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
+
+    answerType = models.CharField(
+        max_length=20,
+        choices=ANSWER_TYPE_CHOICES,
+        default=SINGLE_CHOICE
+    )
 
     def __str__(self):
         return f"Question with id {self.gid} - Question: {self.question}, Tpye: {self.type}, Difficulty: {self.difficulty}"

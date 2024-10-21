@@ -13,7 +13,14 @@ class QuestionForm(forms.ModelForm):
 
     class Meta:
         model = Question
-        fields = ['question', 'type', 'difficulty']
+        fields = ['question', 'type', 'difficulty', 'answerType']
+
+    # Overriding the answerType field to use the choices from the model
+    answerType = forms.ChoiceField(
+        choices=Question.ANSWER_TYPE_CHOICES,  # Use the choices defined in the model
+        label='Answer Type',
+        required=True
+    )
 
     def clean_difficulty(self):
         difficulty = self.cleaned_data.get('difficulty')

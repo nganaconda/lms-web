@@ -50,13 +50,17 @@
                             {{ form.type }}
                         </div>
                         <div>
+                            <label for="id_answer_type">Answer Type:</label>
+                            {{ form.answerType }}
+                        </div>
+                        <div>
                             <label for="id_difficulty">Difficulty:</label>
                             <input type="number" id="id_difficulty" name="difficulty" min="1" max="4">
                         </div>
                     </div>
                 
                     <div>
-                        <h2>Attributes</h2>
+                        <h2 id="id_attributes-title">Attributes</h2>
                         {{ formset.management_form }}
                         <div id="attributes-container">
                             {% for subform in formset %}
@@ -87,40 +91,139 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle adding new attribute forms
-            document.getElementById('add-attribute').addEventListener('click', function() {
+        function attachRemoveEvent(button) {
+            button.addEventListener('click', function () {
                 var container = document.getElementById('attributes-container');
                 var totalForms = document.getElementById('id_form-TOTAL_FORMS');
-                var newForm = container.children[0].cloneNode(true);
                 var formCount = parseInt(totalForms.value);
-                totalForms.value = formCount + 1;
-                var regex = new RegExp(`form-(\\d+)-`, 'g');
-                newForm.innerHTML = newForm.innerHTML.replace(regex, `form-${formCount}-`);
-                container.appendChild(newForm);
-                
-                // Attach the event listener to the new "X" button
-                attachRemoveEvent(newForm.querySelector('.remove-attribute'));
+
+                // Remove the parent form container of the button clicked
+                var formToRemove = this.closest('.attribute-form');
+                formToRemove.remove();
+
+                // Update total form count
+                totalForms.value = formCount - 1;
+
+                // Re-index the remaining forms dynamically
+                reindexForms();
+
+                // After re-indexing, refresh the event listeners for all remove buttons
+                refreshRemoveEvents();
+
+                // After removal, disable deletion if only one form is left
+                toggleRemoveButtons();
             });
+        }
 
-            // Attach remove event to existing forms
-            document.querySelectorAll('.remove-attribute').forEach(attachRemoveEvent);
+        // Function to re-index forms after a form is removed
+        function reindexForms() {
+            var container = document.getElementById('attributes-container');
+            var forms = container.querySelectorAll('.attribute-form');
+            
+            forms.forEach(function (form, index) {
+                var regex = /form-(\d+)-/g;
+                form.innerHTML = form.innerHTML.replace(regex, `form-${index}-`);
+            });
+        }
 
-            function attachRemoveEvent(button) {
-                button.addEventListener('click', function() {
-                    var container = document.getElementById('attributes-container');
-                    var form = this.parentElement;
-                    var totalForms = document.getElementById('id_form-TOTAL_FORMS');
-                    var formCount = parseInt(totalForms.value);
+        // Function to refresh the remove event listeners after re-indexing or adding a form
+        function refreshRemoveEvents() {
+            document.querySelectorAll('.remove-attribute').forEach(function (button) {
+                // Remove any previous event listeners attached to the button
+                var newButton = button.cloneNode(true);
+                button.replaceWith(newButton);
+                attachRemoveEvent(newButton);
+            });
+        }
 
-                    if (formCount > 1) {
-                        form.remove();
-                        totalForms.value = formCount - 1;
-                    } else {
-                        form.querySelector('input').value = ''; // Clear content if it's the only form
-                    }
+        function toggleRemoveButtons() {
+            var totalForms = document.getElementById('id_form-TOTAL_FORMS').value;
+            var removeButtons = document.querySelectorAll('.remove-attribute');
+
+            // Disable all remove buttons if only one form remains, else enable them
+            if (parseInt(totalForms) === 1) {
+                removeButtons.forEach(function (button) {
+                    button.disabled = true;
+                });
+
+                // Clear the input field if there's only one form left
+                var onlyForm = document.querySelector('.attribute-form input');
+                if (onlyForm) {
+                    onlyForm.value = ''; // Clear the content of the last remaining form's input
+                }
+            } else {
+                removeButtons.forEach(function (button) {
+                    button.disabled = false;
                 });
             }
+        }
+
+        // Function to add a new attribute form
+        document.getElementById('add-attribute').addEventListener('click', function () {
+            var container = document.getElementById('attributes-container');
+            var totalForms = document.getElementById('id_form-TOTAL_FORMS');
+            var formCount = parseInt(totalForms.value);
+            var newForm = container.children[0].cloneNode(true);
+
+            // Clear the input value of the cloned form
+            newForm.querySelector('input').value = '';
+
+            // Re-index the new form
+            var regex = new RegExp(`form-(\\d+)-`, 'g');
+            newForm.innerHTML = newForm.innerHTML.replace(regex, `form-${formCount}-`);
+
+            // Append the new form to the container
+            container.appendChild(newForm);
+
+            // Update the total form count
+            totalForms.value = formCount + 1;
+
+            // Attach the remove event to the new form's remove button
+            attachRemoveEvent(newForm.querySelector('.remove-attribute'));
+
+            // Refresh all event listeners after adding a new form
+            refreshRemoveEvents();
+
+            // Ensure remove buttons are enabled when more than one form exists
+            toggleRemoveButtons();
+        });
+
+        // Attach remove events to any existing remove buttons on page load
+        document.querySelectorAll('.remove-attribute').forEach(attachRemoveEvent);
+
+        // On page load, check if removal buttons should be enabled or disabled
+        toggleRemoveButtons();
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const answerTypeField = document.getElementById('id_answerType');
+            const attributesContainer = document.getElementById('attributes-container');
+            const addAttributeButton = document.getElementById('add-attribute');
+            const rightAnswerText = document.getElementById('id_rightAnswerText');
+            const idAttributesTitle = document.getElementById('id_attributes-title');
+
+            // Function to show/hide attributes based on answer type
+            function toggleAttributesBasedOnAnswerType() {
+                if (answerTypeField.value === 'Text') {
+                    // Hide the attributes section and "Add Another Attribute" button
+                    attributesContainer.style.display = 'none';
+                    addAttributeButton.style.display = 'none';
+                    idAttributesTitle.style.display = 'none';
+                } else {
+                    // Show the attributes section and "Add Another Attribute" button
+                    attributesContainer.style.display = 'block';
+                    addAttributeButton.style.display = 'inline-block';
+                    idAttributesTitle.style.display = 'block';
+                }
+            }
+
+            // Run on page load
+            toggleAttributesBasedOnAnswerType();
+
+            // Listen for changes in the answer type dropdown
+            answerTypeField.addEventListener('change', function() {
+                toggleAttributesBasedOnAnswerType();
+            });
         });
     </script>
 </body>
