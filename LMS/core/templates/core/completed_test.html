@@ -42,12 +42,26 @@
                         <h2>{{ question.question_text }}</h2>
                         <h3>Weight (0-1): {{ question.question_weight }}</h3>
                         <ul>
-                            {% for attribute in question.attributes %}
-                                <li class="{% if attribute.answer_text == attribute.rightAnswer %}correct{% endif %} {% if attribute.is_selected and not attribute.is_correct %}incorrect{% endif %}">
-                                    <input type="radio" {% if attribute.is_selected %}checked{% endif %} disabled>
-                                    <label>{{ attribute.answer_text }}</label>
-                                </li>
-                            {% endfor %}
+                            {% if question.question_type == "Text" %}
+                                <!-- Display the correct and student's text answers for "Text" type questions -->
+                                <label>Your Answer:</label>
+                                {% for attribute in question.attributes %}
+                                    <input type="text" value="{{ attribute.answer_text }}" disabled
+                                        class="{% if attribute.is_correct %}correct{% else %}incorrect{% endif %}">
+
+                                    {% if attribute.answer_text != attribute.rightAnswer %}
+                                        <p class="correct-answer">Correct Answer: <span class="correct">{{ attribute.rightAnswer }}</span></p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <!-- Display the choices for multiple choice questions -->
+                                {% for attribute in question.attributes %}
+                                    <li class="{% if attribute.answer_text == attribute.rightAnswer %}correct{% endif %} {% if attribute.is_selected and not attribute.is_correct %}incorrect{% endif %}">
+                                        <input type="radio" {% if attribute.is_selected %}checked{% endif %} disabled>
+                                        <label>{{ attribute.answer_text }}</label>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
                         </ul>
                     </div>
                 {% endfor %}

@@ -126,6 +126,14 @@ main {
     margin-bottom: 10px;
 }
 
+.text-answer-box {
+    width: 50%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
 .submit-button {
     background-color: #4CAF50;
     color: white;

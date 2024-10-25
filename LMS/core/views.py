@@ -385,7 +385,7 @@ def addTest(request):
                         # Query for questions that match the criteria
                         matching_questions = Question.objects.filter(
                             type=test_type,
-                            difficulty=test_difficulty,
+                            difficulty__lte=test_difficulty,  # Use `__lte` for less than or equal comparison
                             professor=professor
                         )
 
@@ -588,6 +588,7 @@ def completed_test_view(request, test_gid):
         
         # Get all the answers related to this completed test
         completed_test_answers = CompletedTestAnswer.objects.filter(completedTest=completed_test).select_related('question', 'attribute')
+        completed_test_answer = CompletedTestAnswer.objects.filter(completedTest=completed_test).select_related('question')
         
         # Prepare the data structure to be passed to the template
         questions_info = []
@@ -599,23 +600,35 @@ def completed_test_view(request, test_gid):
             question_data = {
                 'question_text': question.question,
                 'question_weight': get_test_question(str(completed_test.test.gid).replace('-', ''), str(question.gid).replace('-', '')),
+                'question_type': question.answerType,
                 'attributes': []
             }
             original_question = Question.objects.get(question=question.question)
             
-            for attribute in attributes:
-                # Find the selected answer and whether it was correct
-                selected_answer = completed_test_answers.filter(question=question, attribute=attribute).first()
+            if question.answerType == 'Text':
+                selected_answer = completed_test_answer.filter(question=question).first()
                 rightAnswer = original_question.rightAnswer
-                is_selected = selected_answer is not None
                 is_correct = selected_answer.is_correct if selected_answer else False
                 
                 question_data['attributes'].append({
-                    'answer_text': attribute.answer,
-                    'is_selected': is_selected,
+                    'answer_text': selected_answer.text,
                     'is_correct': is_correct,
-                    'rightAnswer': rightAnswer.answer
+                    'rightAnswer': rightAnswer.answer,
                 })
+            else:
+                for attribute in attributes:
+                    # Find the selected answer and whether it was correct
+                    selected_answer = completed_test_answers.filter(question=question, attribute=attribute).first()
+                    rightAnswer = original_question.rightAnswer
+                    is_selected = selected_answer is not None
+                    is_correct = selected_answer.is_correct if selected_answer else False
+                    
+                    question_data['attributes'].append({
+                        'answer_text': attribute.answer,
+                        'is_selected': is_selected,
+                        'is_correct': is_correct,
+                        'rightAnswer': rightAnswer.answer
+                    })
             
             questions_info.append(question_data)
         
@@ -1074,6 +1087,7 @@ def completeTest(request, test_gid):
                 'question_text': question.question,
                 'gid': question.gid,
                 'question_weight': get_test_question(testgid, questiongid),
+                'question_type': question.answerType,
                 'attributes': []
             }
             
@@ -1129,22 +1143,41 @@ def submitTest(request, test_gid):
 
             for question in questions:
 
-                selected_answer_gid = request.POST.get(str(question.gid))
-                if selected_answer_gid:
-                    selected_answer = Attribute.objects.get(gid=selected_answer_gid)
-                    
-                    completedTestAnswer = CompletedTestAnswer.objects.create(
-                    question=question,
-                    completedTest=completedTest,
-                    is_correct=False,
-                    attribute=selected_answer
-                    )
+                selected_answer_input = request.POST.get(str(question.gid))
+                if selected_answer_input :
 
-                    if selected_answer == question.rightAnswer:
-                        weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
-                        score += weight
-                        completedTestAnswer.is_correct=True
-                        completedTestAnswer.save()
+                    if question.answerType == "Text":
+                        # Create the CompletedTestAnswer with the raw text answer
+                        completedTestAnswer = CompletedTestAnswer.objects.create(
+                            question=question,
+                            completedTest=completedTest,
+                            is_correct=False,
+                            text=selected_answer_input  # Assuming 'text_answer' field exists
+                        )
+                        # Check if the text answer matches the correct answer text
+                        if selected_answer_input.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', '') == question.rightAnswer.answer.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', ''):
+                            weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
+                            score += weight
+                            completedTestAnswer.is_correct = True
+                            completedTestAnswer.save()
+                    else:
+                        try:
+                            selected_answer = Attribute.objects.get(gid=selected_answer_input)
+                            
+                            completedTestAnswer = CompletedTestAnswer.objects.create(
+                                question=question,
+                                completedTest=completedTest,
+                                is_correct=False,
+                                attribute=selected_answer
+                            )
+
+                            if selected_answer == question.rightAnswer:
+                                weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
+                                score += weight
+                                completedTestAnswer.is_correct=True
+                                completedTestAnswer.save()
+                        except Attribute.DoesNotExist:
+                            pass
             
             # Calculate the score as a percentage
             score_percentage = score * 10

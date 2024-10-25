@@ -41,12 +41,20 @@
                             <h2>{{ question.question_text }}</h2>
                             <h3>Weight (0-1): {{ question.question_weight }}</h3>
                             <ul>
-                                {% for attribute in question.attributes %}
-                                    <li>
-                                        <input type="radio" name="{{ question.gid }}" value="{{ attribute.gid }}" id="{{ attribute.gid }}">
-                                        <label for="{{ attribute.gid }}">{{ attribute.answer_text }}</label>
-                                    </li>
-                                {% endfor %}
+                                {% if question.question_type == "Text" %}
+                                <!-- Display a blank text box for Text answer type questions -->
+                                <li>
+                                    <input type="text" name="{{ question.gid }}" placeholder="Enter your answer here" class="text-answer-box">
+                                </li>
+                                {% else %}
+                                    <!-- Display radio buttons for multiple choice questions -->
+                                    {% for attribute in question.attributes %}
+                                        <li>
+                                            <input type="radio" name="{{ question.gid }}" value="{{ attribute.gid }}" id="{{ attribute.gid }}">
+                                            <label for="{{ attribute.gid }}">{{ attribute.answer_text }}</label>
+                                        </li>
+                                    {% endfor %}
+                                {% endif %}
                             </ul>
                         </div>
                     {% endfor %}

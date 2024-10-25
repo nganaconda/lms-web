@@ -467,8 +467,9 @@ CREATE TABLE completedTests (
 CREATE TABLE completedTestAnswers (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     is_correct BOOLEAN NOT NULL DEFAULT 0,
+    text CHAR(100),
     question_id CHAR(36) NOT NULL,
-    attribute_id CHAR(36) NOT NULL,
+    attribute_id CHAR(36),
     completedTest_id CHAR(36) NOT NULL,
     FOREIGN KEY (question_id) REFERENCES Questions(gid),
     FOREIGN KEY (attribute_id) REFERENCES Attributes(gid),

@@ -192,6 +192,7 @@ class CompletedTestAnswer(models.Model):
     
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     is_correct = models.BooleanField(default=False)
+    text = models.CharField(max_length=100)
     question = models.ForeignKey(Question, related_name='completed_test_answers', on_delete=models.CASCADE)
     attribute = models.ForeignKey(Attribute, related_name='completed_test_answers', on_delete=models.CASCADE)
     completedTest = models.ForeignKey(CompletedTest, related_name='completed_test_answers', on_delete=models.CASCADE)
