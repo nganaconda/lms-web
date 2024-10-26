@@ -43,8 +43,14 @@
                         <ul>
                             {% for attribute in question.attributes %}
                                 <li>
-                                    <input type="radio" disabled>
-                                    <label>{{ attribute.answer_text }}</label>
+                                    {% if question.question_type == "Text" %}
+                                        {% for attribute in question.attributes %}
+                                            <input type="text" value="{{ attribute.answer_text }}" disabled>
+                                        {% endfor %}
+                                    {% else %}
+                                        <input type="radio" {% if attribute.rightAnswer == attribute.answer_text %}checked{% endif %} disabled>
+                                        <label>{{ attribute.answer_text }}</label>
+                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>
