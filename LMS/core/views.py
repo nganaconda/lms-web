@@ -34,6 +34,7 @@ import random
 import math
 import logging
 from datetime import datetime
+import re  # To use regular expressions for bracket extraction
 
 
 User = get_user_model()
@@ -456,7 +457,7 @@ def remakeTest(request, test_gid):
             # Query for questions that match the criteria
             matching_questions = Question.objects.filter(
                 type=test_type,
-                difficulty=test_difficulty,
+                difficulty__lte=test_difficulty,  # Use `__lte` for less than or equal comparison
                 professor=professor
             )
 
@@ -749,6 +750,7 @@ def viewCreated(request, test_gid):
             attributes = question.attributes.all()
             question_data = {
                 'question_text': question.question,
+                'question_type': question.answerType,
                 'weight': get_test_question(testgid, questiongid),
                 'attributes': []
             }
@@ -944,8 +946,20 @@ def addQuestion(request):
                     question.professor = professor  # Assign the logged-in professor
                     question.save()
 
-                    # Handle the right answer
+                    # Handle FILL_IN_BLANK question type
+                    if form.cleaned_data['answerType'] == 'Fill in Blank':
+                        question_text = form.cleaned_data['question']
+                        
+                        # Extract the answer inside the brackets
+                        match = re.search(r'\[(.*?)\]', question_text)
+                        if match:
+                            question_text = re.sub(r"\[.*?\]", "_____", question_text)
+
+                            # Save the updated question text
+                            question.question = question_text
+
                     right_answer_text = form.cleaned_data['rightAnswerText']
+                    
                     right_answer = Attribute.objects.create(answer=right_answer_text)
                     question.rightAnswer = right_answer
                     question.attributes.add(right_answer)

@@ -408,7 +408,7 @@ CREATE TABLE classGroups_students (
 CREATE TABLE Tests (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     level INT NOT NULL,
-    age INT NOT NULL,
+    #age INT NOT NULL,
     type VARCHAR(100) NOT NULL,
     test_name VARCHAR(100) NOT NULL,
     questions_no INT NOT NULL,

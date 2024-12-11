@@ -74,8 +74,15 @@
                         </div>
                         <button type="button" id="add-attribute">Add Another Attribute</button>
                     </div>
+
+                    <!-- Fill in the Blank Section -->
+                    <div id="fill-in-blank-section" style="display: none;">
+                        <h2>Fill in the Blank Answer</h2>
+                        <label for="blank-answer">Instruction:</label>
+                        <p>Type your question and add brackets around the answer.</p>
+                    </div>
                 
-                    <div>
+                    <div id="right-answer-section">
                         <h2>Right Answer</h2>
                         <label for="id_rightAnswerText">Right Answer:</label>
                         {{ form.rightAnswerText }}
@@ -201,6 +208,9 @@
             const addAttributeButton = document.getElementById('add-attribute');
             const rightAnswerText = document.getElementById('id_rightAnswerText');
             const idAttributesTitle = document.getElementById('id_attributes-title');
+            const fillInBlankSection = document.getElementById('fill-in-blank-section');
+            const rightAnswerSection = document.getElementById('right-answer-section');
+            const questionInput = document.getElementById('id_question');
 
             // Function to show/hide attributes based on answer type
             function toggleAttributesBasedOnAnswerType() {
@@ -209,16 +219,53 @@
                     attributesContainer.style.display = 'none';
                     addAttributeButton.style.display = 'none';
                     idAttributesTitle.style.display = 'none';
+                    fillInBlankSection.style.display = 'none';
+                    rightAnswerSection.style.display = 'block';
+                    rightAnswerText.readOnly = false;
+                    addAttributeButton.innerText = 'Add Another Attribute';
+                } else if (answerTypeField.value === 'Fill in Blank') {
+                    // Hide attributes and show instruction for Fill in Blank
+                    attributesContainer.style.display = 'none';
+                    addAttributeButton.style.display = 'inline-block';
+                    addAttributeButton.innerText = 'Apply Answer';
+                    idAttributesTitle.style.display = 'none';
+                    rightAnswerSection.style.display = 'block';
+                    rightAnswerText.readOnly = true; // Make Right Answer readonly
                 } else {
                     // Show the attributes section and "Add Another Attribute" button
                     attributesContainer.style.display = 'block';
                     addAttributeButton.style.display = 'inline-block';
                     idAttributesTitle.style.display = 'block';
+                    fillInBlankSection.style.display = 'none';
+                    rightAnswerSection.style.display = 'block';
+                    rightAnswerText.readOnly = false;
+                    addAttributeButton.innerText = 'Add Another Attribute';
+                }
+            }
+
+            // Extract answer from brackets in the question text
+            function extractAnswerFromBrackets() {
+                const questionText = questionInput.value;
+                const match = questionText.match(/\[(.*?)\]/);
+                if (match && match[1]) {
+                    rightAnswerText.value = match[1];
+                    rightAnswerText.style.color = 'green'; // Highlight successful extraction
+                    alert('Correct answer applied: ' + match[1]);
+                } else {
+                    alert('Please include the correct answer in brackets within the question text.');
                 }
             }
 
             // Run on page load
             toggleAttributesBasedOnAnswerType();
+
+            // Attach functionality to the "Apply Answer" button
+            addAttributeButton.addEventListener('click', function (event) {
+                if (answerTypeField.value === 'Fill in Blank') {
+                    extractAnswerFromBrackets();
+                    event.preventDefault(); // Prevent adding another attribute for Fill in Blank
+                }
+            });
 
             // Listen for changes in the answer type dropdown
             answerTypeField.addEventListener('change', function() {

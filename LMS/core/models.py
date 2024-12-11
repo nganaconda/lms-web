@@ -111,7 +111,7 @@ class Test(models.Model):
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     test_name = models.CharField(max_length=100)
     level = models.IntegerField()
-    age = models.IntegerField()
+    #age = models.IntegerField()
     type = models.CharField(max_length=100)
     questions_no = models.IntegerField()
     questions_dif = models.IntegerField()
@@ -142,12 +142,12 @@ class Question(models.Model):
     SINGLE_CHOICE = 'Single Choice'
     MULTIPLE_CHOICE = 'Multiple Choice'
     TEXT = 'Text'
-    PICK = 'Pick'
+    FILL_IN_BLANK = 'Fill in Blank'
     
     ANSWER_TYPE_CHOICES = [
         (SINGLE_CHOICE, 'Single Choice'),
         (TEXT, 'Text'),
-        (PICK, 'Pick'),
+        (FILL_IN_BLANK, 'Fill in Blank'),
     ]
     
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

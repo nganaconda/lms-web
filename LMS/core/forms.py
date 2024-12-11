@@ -10,6 +10,7 @@ class UserModelForm(ModelForm):
 
 class QuestionForm(forms.ModelForm):
     rightAnswerText = forms.CharField(label='Right Answer', max_length=100)
+    #fillInAnswerText = forms.CharField(label='blank_answer', max_length=100)
 
     class Meta:
         model = Question
@@ -54,7 +55,7 @@ class TestForm(forms.ModelForm):
 
     class Meta:
         model = Test
-        fields = ['test_name', 'level', 'age', 'type', 'questions_no', 'questions_dif', 'classGroup']
+        fields = ['test_name', 'level', 'type', 'questions_no', 'questions_dif', 'classGroup']
 
     def __init__(self, *args, **kwargs):
         professor = kwargs.pop('professor', None)
