@@ -35,6 +35,9 @@ import math
 import logging
 from datetime import datetime
 import re  # To use regular expressions for bracket extraction
+from django.db.models import Q
+from django.http import JsonResponse
+import json
 
 
 User = get_user_model()
@@ -720,6 +723,12 @@ def get_test_question(test_id, question_id):
         return None
 
 
+def get_question_attributes(request, question_gid):
+    question = get_object_or_404(Question, gid=question_gid)
+    attributes = list(question.attributes.values('gid', 'answer'))
+    return JsonResponse({'attributes': attributes})
+
+
 def viewCreated(request, test_gid):
     logger = logging.getLogger('django')
     username = request.session.get('username')
@@ -739,6 +748,12 @@ def viewCreated(request, test_gid):
         
         # Prepare the data structure to be passed to the template
         questions_info = []
+
+        # Collect questions already in the test
+        existing_question_gids = test_questions.values_list('gid', flat=True)
+
+        # Fetch available questions (not already in the test)
+        available_questions = Question.objects.filter(~Q(gid__in=existing_question_gids))
         
         # Iterate through each question in the test
         for question in test_questions:
@@ -771,6 +786,7 @@ def viewCreated(request, test_gid):
             'test_name': test.test_name,
             'createdAt': test.createdAt,
             'questions_info': questions_info,
+            'available_questions': available_questions,
             'test_gid': test.gid
         }
         
@@ -778,6 +794,35 @@ def viewCreated(request, test_gid):
     
     except Users.DoesNotExist:
         return redirect('error_page')  # Or handle as appropriate
+
+
+def updateTestQuestions(request, test_gid):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        action = data.get('action')
+        question_id = data.get('questionId')
+
+        try:
+            test = get_object_or_404(Test, gid=test_gid)
+            question = get_object_or_404(Question, gid=question_id)
+
+            if action == 'add':
+                test.questions.add(question)
+                test.questions_no += 1
+                test.save()
+            elif action == 'remove':
+                test.questions.remove(question)
+                test.questions_no -= 1
+                test.save()
+            else:
+                return JsonResponse({'success': False, 'message': 'Invalid action'}, status=400)
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
 
 @transaction.atomic

@@ -43,31 +43,45 @@
                     <h1>{{ test_name }}</h1>
                     <p>Created at: {{ createdAt|date:"d/m/Y" }}</p>
                     
-                    {% for question in questions_info %}
-                        <div class="question">
-                            <h2>{{ question.question_text }}</h2>
-                                        
-                            <div class="weight-input">
-                                <label for="weight-{{ question.gid }}">Weight (0-1):</label>
-                                <input type="number" id="weight-{{ forloop.counter0 }}" name="weights" step="0.01" min="0" max="1" value="{{ question.weight }}">
+                    <div id="question-list">
+                        <h3>Questions in Test:</h3>
+                        {% for question in questions_info %}
+                            <div class="question">
+                                <h2>{{ question.question_text }}</h2>
+                                            
+                                <div class="weight-input">
+                                    <label for="weight-{{ question.gid }}">Weight (0-1):</label>
+                                    <input type="number" id="weight-{{ forloop.counter0 }}" name="weights" step="0.01" min="0" max="1" value="{{ question.weight }}">
+                                </div>
+                                
+                                <ul>
+                                    {% if question.question_type == "Text" %}
+                                        {% for attribute in question.attributes %}
+                                            <input type="text" value="{{ attribute.answer_text }}" disabled>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for attribute in question.attributes %}
+                                            <li>
+                                                <input type="radio" {% if attribute.rightAnswer == attribute.answer_text %}checked{% endif %} disabled>
+                                                <label>{{ attribute.answer_text }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
                             </div>
-                            
-                            <ul>
-                                {% if question.question_type == "Text" %}
-                                    {% for attribute in question.attributes %}
-                                        <input type="text" value="{{ attribute.answer_text }}" disabled>
-                                    {% endfor %}
-                                {% else %}
-                                    {% for attribute in question.attributes %}
-                                        <li>
-                                            <input type="radio" {% if attribute.rightAnswer == attribute.answer_text %}checked{% endif %} disabled>
-                                            <label>{{ attribute.answer_text }}</label>
-                                        </li>
-                                    {% endfor %}
-                                {% endif %}
-                            </ul>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
+                    
+                    <div>
+                        <label for="add-question-select">Add a Question:</label>
+                        <select id="add-question-select">
+                            <option value="" disabled selected>Select a question</option>
+                            {% for question in available_questions %}
+                                <option value="{{ question.gid }}">{{ question.question }}</option>
+                            {% endfor %}
+                        </select>
+                        <button id="add-question-btn">Add Question</button>
+                    </div>
                 </section>
                 <div class="submit-container">
                     <button type="submit" class="submit-button">Save changes</button>
@@ -84,6 +98,137 @@
 
 
 <script>
+    const addQuestionSelect = document.getElementById('add-question-select');
+    const addQuestionBtn = document.getElementById('add-question-btn');
+    const questionList = document.getElementById('question-list');
+
+    addQuestionBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const selectedOption = addQuestionSelect.options[addQuestionSelect.selectedIndex];
+        if (selectedOption.value) {
+            const questionId = selectedOption.value;
+            const questionText = selectedOption.text;
+
+            // Create a new question item
+            const questionItem = document.createElement('div');
+            questionItem.classList.add('question-item');
+            questionItem.setAttribute('data-question-id', questionId);
+            questionItem.innerHTML = `
+                <h2>${questionText}</h2>
+                <div class="weight-input">
+                    <label for="weight-${questionId}">Weight (0-1):</label>
+                    <input type="number" id="weight-${questionId}" name="weights" step="0.01" min="0" max="1" value="0.00">
+                </div>
+                <button class="remove-question-btn" data-question-id="${questionId}">Remove</button>
+                <ul id="attributes-${questionId}">
+                    <!-- Attributes dynamically added here -->
+                </ul>
+            `;
+
+            // Add to the question list
+            questionList.appendChild(questionItem);
+
+            // Remove the option from the dropdown
+            addQuestionSelect.removeChild(selectedOption);
+
+            // Fetch and display attributes dynamically
+            fetch(`/questions/${questionId}/attributes/`)
+                .then((response) => response.json())
+                .then((data) => {
+                    const attributesList = document.getElementById(`attributes-${questionId}`);
+                    // Clear existing attributes (if any) before adding new ones
+                    attributesList.innerHTML = '';
+                    
+                    // Create a unique name for the radio buttons (e.g., based on the question ID)
+                    const radioGroupName = `question-${questionId}-attributes`;
+
+                    data.attributes.forEach((attribute) => {
+                        // Create list item
+                        const li = document.createElement('li');
+
+                        // Create radio button
+                        const radioInput = document.createElement('input');
+                        radioInput.type = 'radio';
+                        radioInput.name = radioGroupName; // Group radios by question
+                        radioInput.value = attribute.gid; // Use the attribute's ID as the value
+                        radioInput.disabled = true;
+
+                        // Create label
+                        const label = document.createElement('label');
+                        label.textContent = attribute.answer; // Set the label text
+
+                        // Append the radio button and label to the list item
+                        li.appendChild(radioInput);
+                        li.appendChild(label);
+
+                        // Append the list item to the attributes list
+                        attributesList.appendChild(li);
+                    });
+                });
+
+            // Add event listener for remove button
+            questionItem.querySelector('.remove-question-btn').addEventListener('click', (e) => {
+                removeQuestion(questionId, questionText);
+            });
+
+            // Send to the backend
+            updateTestQuestion('add', questionId);
+
+            // Adjust weights dynamically
+            adjustWeights();
+        }
+    });
+
+    function removeQuestion(questionId, questionText) {
+        // Remove the question item from the list
+        const questionItem = document.querySelector(`.question-item[data-question-id="${questionId}"]`);
+        questionList.removeChild(questionItem);
+
+        // Add the option back to the dropdown
+        const newOption = document.createElement('option');
+        newOption.value = questionId;
+        newOption.text = questionText;
+        addQuestionSelect.appendChild(newOption);
+
+        // Send to the backend
+        updateTestQuestion('remove', questionId);
+        // Adjust weights dynamically
+        adjustWeights();
+    }
+
+    function updateTestQuestion(action, questionId) {
+        fetch(`/test/{{ test_gid }}/update-questions/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ action, questionId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert('Error updating questions');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Failed to update questions');
+        });
+    }
+
+    function adjustWeights() {
+        const weightInputs = Array.from(document.querySelectorAll('input[name="weights"]'));
+        const totalQuestions = weightInputs.length;
+
+        if (totalQuestions > 0) {
+            const equalWeight = (1 / totalQuestions).toFixed(2);
+            weightInputs.forEach((input) => {
+                input.value = equalWeight;
+            });
+        }
+    }
+
     document.getElementById('weight-form').onsubmit = function(event) {
         // Prevent form submission
         event.preventDefault();

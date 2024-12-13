@@ -164,6 +164,21 @@ main {
     margin-right: 10px;
 }
 
+main li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+main ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+main input[type="radio"] {
+    margin-right: 10px;
+}
+
 .submit-container {
     padding-top: 20px;
     display: flex;
@@ -224,3 +239,5 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+
