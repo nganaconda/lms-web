@@ -1,37 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to AUEB LMS</title>
-    <link rel="stylesheet" href="/static/css/newTests_style.css">
-</head>
-<body>
-    <header>
-        <div class="header-container">
-            <button class="home-button" onclick="location.href='/portfolio/'">
-                <img src="/static/home.png" alt="Home">
-            </button>
-            <div class="header-right">
-                <button onclick="location.href='/profile/'">{{ username }}</button>
-                <button onclick="location.href='/'">Logout</button>
-            </div>
-        </div>
-    </header>
-    <div class="main-container">
-        <aside>
-            <div class="logo-container">
-                <img src="/static/logo.png" alt="Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/portfolio/">My Test History</a></li>
-                    <li><a href="/newTests/">New Tests</a></li>
-                    <li><a href="/grades/">My Grades</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main>
+{% extends 'core/stud_base.html' %}
+
+{% block title %}My new Tests{% endblock %}
+
+{% load static %}
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'css/newTests_style.css' %}">
+{% endblock %}
+{% block content %}
             <section class="newTests">
                 <h1>My New Tests</h1>
                 <table>
@@ -55,10 +30,4 @@
                     </tbody>
                 </table>
             </section>
-        </main> 
-    </div>
-    <footer>
-        <p>&copy; 2024 AUEB LMS</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

@@ -1,38 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add a new Test</title>
-    <link rel="stylesheet" href="/static/css/addTest_style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <header>
-        <div class="header-container">
-            <button class="home-button" onclick="location.href='/portfolio/'">
-                <img src="/static/home.png" alt="Home">
-            </button>
-            <div class="header-right">
-                <button onclick="location.href='/profile/'">{{ username }}</button>
-                <button onclick="location.href='/'">Logout</button>
-            </div>
-        </div>
-    </header>
-    <div class="main-container">
-        <aside>
-            <div class="logo-container">
-                <img src="/static/logo.png" alt="Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/portfolio/">My Tests</a></li>
-                    <li><a href="/questions/">My Test Questions</a></li>
-                    <li><a href="/professor-grades/">My Students Grades</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main>
+{% extends 'core/base.html' %}
+
+{% block title %}Add a new Test{% endblock %}
+
+{% load static %}
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'css/addTest_style.css' %}">
+{% endblock %}
+{% block content %}
             <section class="add_test">
                 <h1>Add a new Test</h1>
                 <form method="post" id="add-test-form">
@@ -80,12 +54,7 @@
                 
                     <button type="submit">Create Test</button>
                 </form>
-            </section>
-        </main>        
-    </div>
-    <footer>
-        <p>&copy; 2024 AUEB LMS</p>
-    </footer>
+{% endblock %}
 
     <script>
         document.getElementById('add-test-form').addEventListener('submit', function (event) {
@@ -128,5 +97,3 @@
             }
         });
     </script>
-</body>
-</html>

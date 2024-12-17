@@ -767,6 +767,7 @@ def viewCreated(request, test_gid):
                 'question_text': question.question,
                 'question_type': question.answerType,
                 'weight': get_test_question(testgid, questiongid),
+                'gid': question.gid,
                 'attributes': []
             }
             

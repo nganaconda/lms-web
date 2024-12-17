@@ -1,0 +1,13 @@
+{% load static %}
+<header>
+    <div class="header-container">
+        <button class="home-button" onclick="location.href='/portfolio/'">
+            <link rel="stylesheet" href="{% static '/css/prof_header_style.css' %}">
+            <img src="{% static 'home.png' %}" alt="Home">
+        </button>
+        <div class="header-right">
+            <button onclick="location.href='/profile/'">{{ username }}</button>
+            <button onclick="location.href='/'">Logout</button>
+        </div>
+    </div>
+</header>

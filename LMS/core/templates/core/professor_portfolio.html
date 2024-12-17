@@ -1,39 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to AUEB LMS</title>
-    <link rel="stylesheet" href="/static/css/prof_portfolio_style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <header>
-        <div class="header-container">
-            <button class="home-button" onclick="location.href='/portfolio/'">
-                <img src="/static/home.png" alt="Home">
-            </button>
-            <div class="header-right">
-                <button onclick="location.href='/profile/'">{{ username }}</button>
-                <button onclick="location.href='/'">Logout</button>
-            </div>
-        </div>
-    </header>
-    <div class="main-container">
-        <aside>
-            <div class="logo-container">
-                <img src="/static/logo.png" alt="Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/portfolio/">My Tests</a></li>
-                    <li><a href="/questions/">My Test Questions</a></li>
-                    <li><a href="/professor-grades/">My Students Grades</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main>
-            <div class="add-test-container">
+{% extends 'core/base.html' %}
+
+{% block title %}Welcome to AUEB LMS{% endblock %}
+
+{% load static %}
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'css/prof_portfolio_style.css' %}">
+{% endblock %}
+{% block content %}            <div class="add-test-container">
                 <button class="add-test-button" onclick="location.href='/tests/add/'">
                     <i class="fas fa-plus"></i> Add a new Test
                 </button>
@@ -63,10 +36,4 @@
                     </tbody>
                 </table>
             </section>
-        </main> 
-    </div>
-    <footer>
-        <p>&copy; 2024 AUEB LMS</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

@@ -1,37 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ test_name }} - Test</title>
-    <link rel="stylesheet" href="/static/css/createdTest_analysis_style.css">
-</head>
-<body>
-    <header>
-        <div class="header-container">
-            <button class="home-button" onclick="location.href='/portfolio/'">
-                <img src="/static/home.png" alt="Home">
-            </button>
-            <div class="header-right">
-                <button onclick="location.href='/profile/'">{{ username }}</button>
-                <button onclick="location.href='/'">Logout</button>
-            </div>
-        </div>
-    </header>
-    <div class="main-container">
-        <aside>
-            <div class="logo-container">
-                <img src="/static/logo.png" alt="Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/portfolio/">My Tests</a></li>
-                    <li><a href="/questions/">My Test Questions</a></li>
-                    <li><a href="/professor-grades/">My Students Grades</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main>
+{% extends 'core/base.html' %}
+
+{% block title %}{{ test_name }} - Test{% endblock %}
+
+{% load static %}
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'css/createdTest_analysis_style.css' %}">
+{% endblock %}
+{% block content %}
+
             <div class="remake-container">
                 <a href="{% url 'remakeTest' test_gid=test_gid %}" class="remake-test-button">
                     <i class="fas fa-sync"></i> Remake the test
@@ -46,8 +22,9 @@
                     <div id="question-list">
                         <h3>Questions in Test:</h3>
                         {% for question in questions_info %}
-                            <div class="question">
-                                <h2>{{ question.question_text }}</h2>
+                            <div class="question question-item" data-question-id="{{ question.gid }}">
+                                <h2>{{ question.question_text }}</h4>
+                                <button class="remove-exquestion-btn" data-question-id="{{ question.gid }}">Remove</button>
                                             
                                 <div class="weight-input">
                                     <label for="weight-{{ question.gid }}">Weight (0-1):</label>
@@ -88,13 +65,7 @@
                 </div>
                 <div id="error-message" style="color: red;"></div>
             </form>
-        </main>
-    </div>
-    <footer>
-        <p>&copy; 2024 AUEB LMS</p>
-    </footer>
-</body>
-</html>
+{% endblock %}
 
 
 <script>
@@ -253,4 +224,37 @@
             event.target.submit();
         }
     };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Add event listeners to existing remove buttons
+        document.querySelectorAll('.remove-exquestion-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const questionId = e.target.dataset.questionId;
+                //alert(questionId);
+                const questionText = e.target.closest('.question').querySelector('h2').textContent;
+                //alert(questionText);
+                removeQuestion(questionId, questionText);
+            });
+        });
+    });
+
+    function removeQuestion(questionId, questionText) {
+        // Remove the question item from the list
+        const questionItem = document.querySelector(`.question-item[data-question-id="${questionId}"]`);
+        questionList.removeChild(questionItem);
+
+        // Add the option back to the dropdown for user-added questions
+        if (!document.querySelector(`option[value="${questionId}"]`)) {
+            const newOption = document.createElement('option');
+            newOption.value = questionId;
+            newOption.text = questionText;
+            addQuestionSelect.appendChild(newOption);
+        }
+
+        // Send to the backend
+        updateTestQuestion('remove', questionId);
+        // Adjust weights dynamically
+        adjustWeights();
+    }
+
 </script>
