@@ -33,6 +33,7 @@
             </section>
 {% endblock %}
 
+{% block extra_scripts %}
     <script>
         function toggleTests(type) {
             const list = document.getElementById(`${type}-tests`);
@@ -43,5 +44,4 @@
             }
         }
     </script>
-</body>
-</html>
+{% endblock %}
