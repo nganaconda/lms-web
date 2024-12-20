@@ -1,34 +1,72 @@
+/* Sidebar container */
 aside {
-    width: 200px;
-    background-color: #2c2c2c;
+    width: 240px; /* Slightly wider for a modern look */
+    background: linear-gradient(135deg, #9b2d20, #b64d44); /* Dark red gradient */
+    color: #ecf0f1; /* Light text for contrast */
     padding: 20px;
+    height: auto; /* Full viewport height */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    display: flex;
+    flex-direction: column;
 }
 
+/* Logo Container */
 .logo-container {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .logo-container img {
-    width: 100%;
+    width: 50%; /* Slightly smaller to fit cleanly */
     height: auto;
-    margin-bottom: 20px;
+    margin: 0 auto;
+    margin-right: 20px;
+    border-radius: 50%; /* Rounded edges for a professional look */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Shadow around logo */
 }
 
+/* Navigation Menu */
 nav ul {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 nav ul li {
-    margin: 10px 0;
+    margin: 15px 0; /* More spacing between buttons */
 }
 
+/* Navigation Links */
 nav ul li a {
-    color: #fff;
+    display: block;
+    color: #ecf0f1; /* Light grey/white text */
     text-decoration: none;
+    font-family: 'Arial', sans-serif; /* Professional font */
+    font-weight: 600;
+    font-size: 16px;
+    padding: 10px 15px; /* Padding inside the links */
+    border-radius: 5px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth hover effect */
 }
 
+/* Hover effect */
 nav ul li a:hover {
-    text-decoration: underline;
+    background: #e74c3c; /* Red hover effect */
+    color: #fff; /* Text becomes white */
+    transform: translateX(5px); /* Slight movement to the right */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* Adds depth */
+}
+
+/* Active state for current page */
+nav ul li a:active, nav ul li a:focus {
+    background: #c0392b; /* Slightly darker red */
+    outline: none; /* Removes focus outline */
+}
+
+/* Footer style (optional if added later) */
+aside footer {
+    text-align: center;
+    font-size: 12px;
+    color: #bdc3c7; /* Lighter grey */
+    margin-top: auto; /* Pushes footer to the bottom */
 }

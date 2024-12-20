@@ -55,7 +55,7 @@
                     <button type="submit">Create Test</button>
                 </form>
 {% endblock %}
-
+{% block extra_scripts %}
     <script>
         document.getElementById('add-test-form').addEventListener('submit', function (event) {
             const levelInput = document.getElementById('id_level');
@@ -97,3 +97,4 @@
             }
         });
     </script>
+{% endblock %}

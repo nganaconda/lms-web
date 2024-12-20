@@ -8,14 +8,14 @@
 {% endblock %}
 {% block content %}
 
-            <div class="remake-container">
-                <a href="{% url 'remakeTest' test_gid=test_gid %}" class="remake-test-button">
-                    <i class="fas fa-sync"></i> Remake the test
-                </a>
-            </div>
             <form id="weight-form" method="POST" action="{% url 'save_test_weights' test_gid=test_gid %}">
                 {% csrf_token %}
                 <section class="test">
+                    <div class="remake-container">
+                        <a href="{% url 'remakeTest' test_gid=test_gid %}" class="remake-test-button">
+                            <i class="fas fa-sync"></i> Remake the test
+                        </a>
+                    </div>
                     <h1>{{ test_name }}</h1>
                     <p>Created at: {{ createdAt|date:"d/m/Y" }}</p>
                     
@@ -59,15 +59,14 @@
                         </select>
                         <button id="add-question-btn">Add Question</button>
                     </div>
+                    <div class="submit-container">
+                        <button type="submit" class="submit-button">Save changes</button>
+                    </div>
+                    <div id="error-message" style="color: red;"></div>
                 </section>
-                <div class="submit-container">
-                    <button type="submit" class="submit-button">Save changes</button>
-                </div>
-                <div id="error-message" style="color: red;"></div>
             </form>
 {% endblock %}
-
-
+{% block extra_scripts %}
 <script>
     const addQuestionSelect = document.getElementById('add-question-select');
     const addQuestionBtn = document.getElementById('add-question-btn');
@@ -256,5 +255,5 @@
         // Adjust weights dynamically
         adjustWeights();
     }
-
 </script>
+{% endblock %}

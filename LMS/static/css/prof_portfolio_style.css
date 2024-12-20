@@ -1,102 +1,92 @@
-/* portfolio_style.css */
-
-/* Reset some default styles */
-body, h1, table {
+/* General Reset */
+body, h1, h2, table {
     margin: 0;
     padding: 0;
     border: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif; /* Modern and professional font */
+    color: #502c2c; /* Matches the color scheme of the site */
 }
 
+/* Background for Main Content */
 body {
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #f9fafa; /* Light, professional background */
+    color: #502c2c; /* Darker text color for readability */
+    line-height: 1.6;
 }
 
-.header-container {
-    display: flex;
-    align-items: center;
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    justify-content: space-between; /* Distributes space between items */
-}
-
-.home-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.home-button img {
-    height: 30px;
-    width: auto;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-}
-
-.header-right button {
-    background-color: #555;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    margin: 0 5px;
-    cursor: pointer;
-}
-
-.header-right button:hover {
-    background-color: #777;
-}
-
-.main-container {
-    display: flex;
-    min-height: calc(100vh - 60px);
-}
-
-aside {
-    width: 200px;
-    background-color: #2c2c2c;
-    padding: 20px;
-}
-
-.logo-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.logo-container img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-}
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-nav ul li {
-    margin: 10px 0;
-}
-
-nav ul li a {
-    color: #fff;
-    text-decoration: none;
-}
-
-nav ul li a:hover {
-    text-decoration: underline;
-}
-
+/* Main Content Styling */
 main {
     flex: 1;
+    padding: 30px;
+    background-color: #ffffff; /* Crisp white background */
+    border-radius: 8px; /* Subtle rounding for modern look */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    margin: 20px;
+}
+
+/* Test Scores Section */
+.test-scores {
     padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.test-scores h1 {
+    font-size: 28px; /* Larger, clear heading */
+    margin-bottom: 20px;
+    color: #502c2c; /* Muted blue-gray for heading */
+    border-bottom: 3px solid #b22234; /* Accent underline */
+    padding-bottom: 10px;
+    font-weight: 700; /* Bold for emphasis */
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Light row dividers */
+    font-size: 14px;
+}
+
+table th {
+    background-color: #f4f6f8; /* Slightly different shade for headers */
+    color: #502c2c; /* Dark text for headers */
+    font-weight: bold;
+    text-transform: uppercase; /* Consistent table header styling */
+    letter-spacing: 1px; /* Slight spacing for readability */
+}
+
+table td {
+    color: #4a4a4a; /* Soft dark text */
+}
+
+table tr:hover {
+    background-color: #f8f8f8; /* Highlighted row on hover */
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Links inside the table */
+table a {
+    color: #b22234; /* Accent color for links */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+table a:hover {
+    text-decoration: underline;
+    color: #b22234; /* Slightly darker shade for hover */
+}
+
+/* Empty State Row */
+table tbody tr td[colspan="3"] {
+    text-align: center;
+    color: #7f8c8d; /* Gray for empty state message */
+    font-style: italic;
+    padding: 20px 0;
 }
 
 .add-test-container {
@@ -105,7 +95,7 @@ main {
 }
 
 .add-test-button {
-    background-color: #4CAF50;
+    background: linear-gradient(90deg, #b22234, #8b1c2c);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -116,58 +106,26 @@ main {
 }
 
 .add-test-button:hover {
-    background-color: #45a049;
+    background: linear-gradient(90deg, #8b1c2c, #b22234);
 }
 
 .add-test-button i {
     margin-right: 8px; /* Adds space between the icon and the label */
 }
 
-.test-scores {
-    padding: 20px;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        margin: 10px;
+        padding: 20px;
+    }
 
-.test-scores h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 10px;
-}
+    table th, table td {
+        padding: 10px;
+        font-size: 13px;
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-table th, table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-table th {
-    background-color: #f4f4f4;
-}
-
-table tr:hover {
-    background-color: #f9f9f9;
-}
-
-table a {
-    color: rgba(152,143,138,1);
-    text-decoration: none;
-}
-
-table a:hover {
-    text-decoration: underline;
-}
-
-footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    position: relative;
-    bottom: 0;
-    width: 100%;
+    .test-scores h1 {
+        font-size: 24px;
+    }
 }

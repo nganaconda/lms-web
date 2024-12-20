@@ -1,37 +1,77 @@
+/* Header container styling */
 .header-container {
     display: flex;
     align-items: center;
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
     justify-content: space-between;
+    background: linear-gradient(135deg, #9b2d20, #b64d44); /* Dark red gradient */
+    color: #ecf0f1; /* Light text color for contrast */
+    padding: 15px 20px; /* Balanced padding for a clean look */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    position: sticky; /* Keeps header at the top */
+    top: 0;
+    z-index: 1000; /* Ensures the header is always on top */
 }
 
+/* Home button styling */
 .home-button {
     background: none;
     border: none;
     cursor: pointer;
+    padding: 5px; /* Adds spacing for better clickability */
+    border-radius: 50%; /* Circular shape for the button */
+    transition: all 0.3s ease; /* Smooth hover effect */
 }
 
 .home-button img {
-    height: 30px;
+    height: 30px; /* Slightly larger icon for better visibility */
     width: auto;
+    border-radius: 50%; /* Rounded image for modern look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds depth */
 }
 
+/* Hover effect for the home button */
+.home-button:hover {
+    background: #e74c3c; /* Accent color matching sidebar hover */
+    transform: scale(1.1); /* Slight zoom for hover effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
+}
+
+/* Header right section */
 .header-right {
     display: flex;
     align-items: center;
+    gap: 10px; /* Adds space between buttons */
 }
 
+/* Buttons in the header-right */
 .header-right button {
-    background-color: #555;
-    color: #fff;
+    background: #555; /* Neutral button background */
+    color: #ecf0f1; /* Light text color */
     border: none;
-    padding: 10px 20px;
-    margin: 0 5px;
+    padding: 10px 20px; /* Comfortable padding for a professional feel */
+    margin: 0; /* Removes unnecessary margins */
+    font-family: 'Arial', sans-serif; /* Professional font */
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 5px; /* Rounded corners */
     cursor: pointer;
+    transition: all 0.3s ease; /* Smooth hover effect */
 }
 
+/* Hover effect for header-right buttons */
 .header-right button:hover {
-    background-color: #777;
+    background: #e74c3c; /* Matches sidebar hover color */
+    color: #fff; /* Pure white text for better contrast */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for hover */
+    transform: translateY(-2px); /* Slight upward movement */
+}
+
+/* Logout button specific (optional for highlighting) */
+.header-right button:last-child {
+    background: #e74c3c; /* Red for emphasis */
+}
+
+.header-right button:last-child:hover {
+    background: #c0392b; /* Darker red on hover */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Matches other buttons */
 }

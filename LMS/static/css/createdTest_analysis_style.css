@@ -90,16 +90,20 @@ nav ul li a:hover {
 }
 
 main {
-    flex: 1;
-    padding: 20px;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 900px;
 }
 
+/* Style for the remake test button */
 .remake-container {
     display: flex;
     justify-content: flex-end;
+    margin-bottom: 20px;
 }
 
 .remake-test-button {
@@ -121,18 +125,19 @@ main {
     margin-right: 8px; /* Adds space between the icon and the label */
 }
 
+/* Test section styles */
 .test {
-    width: 100%;
-    max-width: 800px;
+    padding: 30px;
     background-color: #fff;
-    border-radius: 5px;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    margin-bottom: 20px;
 }
 
 .test h1 {
     font-size: 28px;
     margin-bottom: 10px;
+    color: #333;
 }
 
 .test p {
@@ -164,45 +169,39 @@ main {
     margin-right: 10px;
 }
 
-main li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+.question-item {
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-main ul {
-    list-style-type: none;
-    padding: 0;
+.question-item:hover {
+    background-color: #f1f1f1;
 }
 
-main input[type="radio"] {
-    margin-right: 10px;
-}
-
-.submit-container {
-    padding-top: 20px;
-    display: flex;
-}
-
-.submit-button {
-    background-color: #4CAF50;
+/* Button styling for removing questions */
+.remove-exquestion-btn, .remove-question-btn {
+    background-color: #e74c3c;
     color: white;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 5px 10px;
+    font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     transition: background-color 0.3s ease;
 }
 
-.submit-button:hover {
-    background-color: #45a049;
+.remove-exquestion-btn:hover, .remove-question-btn:hover {
+    background-color: #c0392b;
 }
 
-.submit-button i {
-    margin-right: 8px; /* Adds space between the icon and the label */
-}
-
+/* Weight input styling */
 .weight-input {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -230,6 +229,81 @@ main input[type="radio"] {
     outline: none;
 }
 
+/* Dropdown for adding new question */
+#add-question-select {
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+#add-question-btn {
+    padding: 10px 20px;
+    background-color: #9d4d1c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#add-question-btn:hover {
+    background-color: #b15821;
+}
+
+#add-question-btn:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* Submit button styling */
+.submit-container {
+    padding-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.submit-button {
+    background: linear-gradient(90deg, #b22234, #8b1c2c);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background: linear-gradient(90deg, #8b1c2c, #b22234);
+    box-shadow: 0 4px 8px rgba(178, 34, 52, 0.3);
+}
+
+/* Error message styling */
+#error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+ul li input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Footer styles */
 footer {
     text-align: center;
     padding: 10px;
@@ -239,5 +313,3 @@ footer {
     bottom: 0;
     width: 100%;
 }
-
-

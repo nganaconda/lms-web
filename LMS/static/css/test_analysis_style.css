@@ -1,132 +1,116 @@
-/* General styles inherited from portfolio_style.css */
-body, h1, h2, ul, li {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    color: #333;
-}
-
+/* General Styles */
 body {
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #fafafa; /* Subtle light background */
+    color: #2c2c2c;
+    font-family: 'Roboto', Arial, sans-serif;
+    line-height: 1.6;
 }
 
+h1, h2, h3 {
+    color: #b12a2a; /* Consistent red theme */
+    margin-bottom: 10px;
+}
+
+/* Header */
 .header-container {
-    display: flex;
-    align-items: center;
-    background-color: #333;
+    background-color: #b12a2a; /* Red header */
     color: #fff;
-    padding: 10px;
-    justify-content: space-between;
-}
-
-.home-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.home-button img {
-    height: 30px;
-    width: auto;
-}
-
-.header-right {
+    padding: 15px 20px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .header-right button {
-    background-color: #555;
+    background-color: #d64545;
     color: #fff;
     border: none;
-    padding: 10px 20px;
-    margin: 0 5px;
+    padding: 10px 15px;
+    margin-left: 10px;
+    border-radius: 3px;
+    font-size: 14px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .header-right button:hover {
-    background-color: #777;
+    background-color: #c23e3e;
 }
 
-.main-container {
-    display: flex;
-    min-height: calc(100vh - 60px);
-}
-
+/* Sidebar */
 aside {
-    width: 200px;
-    background-color: #2c2c2c;
+    background-color: #b12a2a;
+    color: #fff;
     padding: 20px;
-}
-
-.logo-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.logo-container img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-}
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-nav ul li {
-    margin: 10px 0;
+    height: 100vh;
 }
 
 nav ul li a {
-    color: #fff;
-    text-decoration: none;
+    color: #ffe6e6; /* Softer white links */
+    font-size: 16px;
+    padding: 5px 10px;
+    display: block;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
 }
 
 nav ul li a:hover {
-    text-decoration: underline;
+    background-color: #d64545;
 }
 
+/* Main Content */
 main {
-    flex: 1;
-    padding: 20px;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Test Section */
 .test {
     width: 100%;
-    max-width: 800px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    margin: 0 auto;
     padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .test h1 {
     font-size: 28px;
-    margin-bottom: 10px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .test p {
     font-size: 16px;
     margin-bottom: 20px;
+    text-align: center;
+    color: #555;
 }
 
+/* Question Cards */
 .question {
-    margin-bottom: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .question h2 {
     font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
 }
 
 .question h3 {
-    font-size: 17px;
-    margin-bottom: 10px;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
 }
 
 .question ul {
@@ -140,16 +124,58 @@ main {
     margin-bottom: 10px;
 }
 
-.question input[type="radio"] {
+.question input[type="radio"], .question input[type="text"] {
     margin-right: 10px;
+    font-size: 14px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: auto;
 }
 
+.question input[type="radio"]:checked {
+    accent-color: #b12a2a; /* Red radio button check */
+}
+
+.question input[type="text"]:disabled {
+    background-color: #eee;
+    color: #333;
+    cursor: not-allowed;
+}
+
+/* Footer */
 footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #333;
+    background-color: #b12a2a; /* Match header/footer */
     color: white;
-    position: relative;
-    bottom: 0;
-    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-container, .main-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .test {
+        padding: 15px;
+    }
+
+    .question {
+        padding: 15px;
+    }
+
+    .question h2 {
+        font-size: 18px;
+    }
+
+    .question h3 {
+        font-size: 14px;
+    }
+
+    nav ul li a {
+        font-size: 14px;
+    }
 }
