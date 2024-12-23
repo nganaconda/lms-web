@@ -7,77 +7,136 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        /* General Body Styling */
         body {
-            background-color: #f8f9fa;
+            background: url('static/welcome-background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
         }
 
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 30px;
-            background-color: #ffffff;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #007bff;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .btn-register {
+        /* Navbar Styling */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
             width: 100%;
-            padding: 12px;
-            font-size: 18px;
+            z-index: 10;
+        }
+
+        .navbar-nav .nav-link {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Container Styling */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 1.2s ease-in-out;
+            margin-top: 100px; /* Space below navbar */
+            overflow-y: auto; /* Enable scrolling if content overflows */
+        }
+
+        /* Title Styling */
+        .alert-primary {
             background-color: #007bff;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            padding: 15px;
+        }
+
+        /* Form Styling */
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
             border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Register Button Styling */
+        .btn-register {
+            background-color: #007bff;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 12px 30px;
+            border-radius: 25px;
             transition: all 0.3s ease;
+            color: white;
         }
 
         .btn-register:hover {
             background-color: #0056b3;
-            border-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
         }
 
-        .form-control {
-            border-radius: 20px;
-        }
-
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #007bff;
-        }
-
-        .alert {
+        /* Error Messages */
+        .alert-danger {
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
             text-align: center;
         }
 
-        .professor-id {
-            display: none;
-        }
-
-        .department {
-            display: none;
+        /* Role Switch Styling */
+        .role-switch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .switch-container {
             display: flex;
-            align-items: center;  /* This aligns items vertically in the center */
-            gap: 10px;  /* Adds space between the switch and the text */
+            align-items: center;
+            gap: 10px;
         }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 40px;  /* Smaller width */
-            height: 20px; /* Smaller height */
-            margin-top: 10px; /* Adjust this value to move the switch downward */
+            width: 40px;
+            height: 20px;
         }
 
         .switch input {
@@ -94,44 +153,70 @@
             right: 0;
             bottom: 0;
             background-color: #ccc;
-            transition: .4s;
-            border-radius: 20px; /* Adjust to match the height */
+            transition: 0.4s;
+            border-radius: 20px;
         }
 
         .slider:before {
             position: absolute;
-            content: "";
-            height: 16px;   /* Smaller circle */
-            width: 16px;    /* Smaller circle */
-            left: 2px;      /* Adjust position */
-            bottom: 2px;    /* Adjust position */
+            content: '';
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
             background-color: white;
-            transition: .4s;
+            transition: 0.4s;
             border-radius: 50%;
         }
 
-        /* When the switch is checked (professor mode) */
+        /* Checked Switch Styles */
         input:checked + .slider {
             background-color: #007bff;
         }
 
         input:checked + .slider:before {
-            transform: translateX(20px); /* Adjust for the smaller size */
+            transform: translateX(20px);
         }
 
-        /* Add focus outline for accessibility */
-        input:focus + .slider {
-            box-shadow: 0 0 1px #007bff;
+        /* Professor and Department Fields */
+        .professor-id,
+        .department {
+            display: none;
         }
 
-        /* Optional styling for a rounded switch */
-        .slider.round {
-            border-radius: 20px; /* Match with switch height */
+        .professor-id.show,
+        .department.show {
+            display: block;
         }
 
-        .slider.round:before {
-            border-radius: 50%;
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .alert-primary {
+                font-size: 20px;
+            }
+
+            .btn-register {
+                font-size: 14px;
+                padding: 10px 25px;
+            }
+        }
+
     </style>
 </head>
 <body>
