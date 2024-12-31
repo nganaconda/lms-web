@@ -24,6 +24,50 @@ main {
     margin: 20px;
 }
 
+/* Search Bar Styling */
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0; /* Space above and below the search bar */
+}
+
+.search-container input {
+    width: 60%; /* Adjust width for balance */
+    padding: 10px 15px;
+    border: 1px solid #ddd; /* Subtle border for modern look */
+    border-radius: 25px 0 0 25px; /* Rounded corners */
+    outline: none;
+    font-size: 16px; /* Comfortable font size */
+    transition: all 0.3s ease;
+}
+
+.search-container input:focus {
+    border-color: #1abc9c; /* Highlight border on focus */
+    box-shadow: 0 0 8px rgba(26, 188, 156, 0.2); /* Subtle glow */
+}
+
+.search-container button {
+    padding: 10px 20px;
+    background-color: #1abc9c; /* Accent color */
+    border: 1px solid #1abc9c; /* Match border */
+    border-radius: 0 25px 25px 0; /* Rounded corners */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-container button:hover {
+    background-color: #16a085; /* Slightly darker shade on hover */
+    border-color: #16a085;
+}
+
+.search-container button:active {
+    transform: scale(0.98); /* Slight button press effect */
+}
+
+
 /* Test Scores Section */
 .test-scores {
     padding: 20px;

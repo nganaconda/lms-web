@@ -192,14 +192,19 @@
                     rightAnswerSection.style.display = 'block';
                     rightAnswerText.readOnly = false;
                     addAttributeButton.innerText = 'Add Another Attribute';
-                } else if (answerTypeField.value === 'Fill in Blank') {
-                    // Hide attributes and show instruction for Fill in Blank
+                    questionInput.setAttribute('placeholder', ''); // Clear placeholder if not needed
+                } else if (answerTypeField.value === 'Fill in Blanks') {
+                    // Hide attributes and show instruction for Fill in Blanks
                     attributesContainer.style.display = 'none';
                     addAttributeButton.style.display = 'inline-block';
                     addAttributeButton.innerText = 'Apply Answer';
                     idAttributesTitle.style.display = 'none';
                     rightAnswerSection.style.display = 'block';
                     rightAnswerText.readOnly = true; // Make Right Answer readonly
+                    questionInput.setAttribute(
+                        'placeholder',
+                        'Please include the correct answer in brackets within the question text.'
+                    );
                 } else {
                     // Show the attributes section and "Add Another Attribute" button
                     attributesContainer.style.display = 'block';
@@ -209,19 +214,23 @@
                     rightAnswerSection.style.display = 'block';
                     rightAnswerText.readOnly = false;
                     addAttributeButton.innerText = 'Add Another Attribute';
+                    questionInput.setAttribute('placeholder', ''); // Clear placeholder if not needed
                 }
             }
 
             // Extract answer from brackets in the question text
             function extractAnswerFromBrackets() {
                 const questionText = questionInput.value;
-                const match = questionText.match(/\[(.*?)\]/);
-                if (match && match[1]) {
-                    rightAnswerText.value = match[1];
+                const matches = questionText.match(/\[(.*?)\]/g); // Get all matches in brackets
+                if (matches) {
+                    // Extract the content inside each set of brackets and join with commas
+                    const answers = matches.map(match => match.slice(1, -1)); // Remove the brackets
+                    const answersText = answers.join(', ');
+                    rightAnswerText.value = answersText;
                     rightAnswerText.style.color = 'green'; // Highlight successful extraction
-                    alert('Correct answer applied: ' + match[1]);
+                    alert('Correct answers applied: ' + answersText);
                 } else {
-                    alert('Please include the correct answer in brackets within the question text.');
+                    alert('Please include the correct answers in brackets within the question text.');
                 }
             }
 
@@ -230,9 +239,9 @@
 
             // Attach functionality to the "Apply Answer" button
             addAttributeButton.addEventListener('click', function (event) {
-                if (answerTypeField.value === 'Fill in Blank') {
+                if (answerTypeField.value === 'Fill in Blanks') {
                     extractAnswerFromBrackets();
-                    event.preventDefault(); // Prevent adding another attribute for Fill in Blank
+                    event.preventDefault(); // Prevent adding another attribute for Fill in Blanks
                 }
             });
 

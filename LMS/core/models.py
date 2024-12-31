@@ -142,12 +142,12 @@ class Question(models.Model):
     SINGLE_CHOICE = 'Single Choice'
     MULTIPLE_CHOICE = 'Multiple Choice'
     TEXT = 'Text'
-    FILL_IN_BLANK = 'Fill in Blank'
+    FILL_IN_BLANKS = 'Fill in Blanks'
     
     ANSWER_TYPE_CHOICES = [
         (SINGLE_CHOICE, 'Single Choice'),
         (TEXT, 'Text'),
-        (FILL_IN_BLANK, 'Fill in Blank'),
+        (FILL_IN_BLANKS, 'Fill in Blanks'),
     ]
     
     gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

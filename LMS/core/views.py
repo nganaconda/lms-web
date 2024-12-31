@@ -992,19 +992,22 @@ def addQuestion(request):
                     question.professor = professor  # Assign the logged-in professor
                     question.save()
 
-                    # Handle FILL_IN_BLANK question type
-                    if form.cleaned_data['answerType'] == 'Fill in Blank':
+                     # Handle FILL_IN_BLANK question type
+                    if form.cleaned_data['answerType'] == 'Fill in Blanks':
                         question_text = form.cleaned_data['question']
                         
-                        # Extract the answer inside the brackets
-                        match = re.search(r'\[(.*?)\]', question_text)
-                        if match:
-                            question_text = re.sub(r"\[.*?\]", "_____", question_text)
+                        # Replace all answers in brackets with underscores
+                        answers = re.findall(r'\[(.*?)\]', question_text)
+                        if answers:
+                            question_text = re.sub(r'\[.*?\]', '_____', question_text)
 
                             # Save the updated question text
                             question.question = question_text
 
-                    right_answer_text = form.cleaned_data['rightAnswerText']
+                            # Create a single string of all answers separated by commas
+                            right_answer_text = ', '.join(answers)
+                    else:
+                        right_answer_text = form.cleaned_data['rightAnswerText']
                     
                     right_answer = Attribute.objects.create(answer=right_answer_text)
                     question.rightAnswer = right_answer

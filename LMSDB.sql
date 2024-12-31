@@ -420,6 +420,12 @@ CREATE TABLE Tests (
     FOREIGN KEY (classGroup_id) REFERENCES ClassGroups(gid)
 );
 
+CREATE TABLE TestTags (
+	tag CHAR(30) NOT NULL,
+    test_id CHAR(36) NOT NULL,
+    FOREIGN KEY (test_id) REFERENCES Tests(gid)
+);
+
 CREATE TABLE Attributes (
     gid CHAR(36) PRIMARY KEY NOT NULL,
     answer VARCHAR(100) NOT NULL
