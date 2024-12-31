@@ -13,7 +13,18 @@
                     {% csrf_token %}
                     {% for question in questions %}
                         <div class="question">
-                            <h2>{{ question.question_text }}</h2>
+                            <h2>
+                                {% if question.question_type == "Fill in Blanks" %}
+                                    {% for part in question.parts %}
+                                        {{ part }}
+                                        {% if not forloop.last %}
+                                            <input type="text" name="{{ question.gid }}-{{ forloop.counter }}" class="fill-blank-input" placeholder="Fill in the blank">
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {{ question.question_text }}
+                                {% endif %}
+                            </h2>
                             <h3>Weight (0-1): {{ question.question_weight }}</h3>
                             <ul>
                                 {% if question.question_type == "Text" %}
@@ -21,7 +32,7 @@
                                 <li>
                                     <input type="text" name="{{ question.gid }}" placeholder="Enter your answer here" class="text-answer-box">
                                 </li>
-                                {% else %}
+                                {% elif question.question_type == "Single Choice" %}
                                     <!-- Display radio buttons for multiple choice questions -->
                                     {% for attribute in question.attributes %}
                                         <li>

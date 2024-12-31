@@ -1147,13 +1147,24 @@ def completeTest(request, test_gid):
 
             # Get all answers (attributes) related to the question
             attributes = question.attributes.all()
-            question_data = {
-                'question_text': question.question,
-                'gid': question.gid,
-                'question_weight': get_test_question(testgid, questiongid),
-                'question_type': question.answerType,
-                'attributes': []
-            }
+            if question.answerType == "Fill in Blanks":
+                # Preprocess the question text for "Fill in Blanks"
+                parts = question.question.split("_____")
+                question_data = {
+                    "gid": question.gid,
+                    "parts": parts,
+                    "question_weight": get_test_question(testgid, questiongid),
+                    "question_type": question.answerType,
+                    'attributes': []
+                }
+            else:
+                question_data = {
+                    'question_text': question.question,
+                    'gid': question.gid,
+                    'question_weight': get_test_question(testgid, questiongid),
+                    'question_type': question.answerType,
+                    'attributes': []
+                }
             
             for attribute in attributes:
                 # Find the selected answer and whether it was correct

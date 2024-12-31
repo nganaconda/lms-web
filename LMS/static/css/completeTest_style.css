@@ -81,6 +81,51 @@ main {
     cursor: pointer;
 }
 
+/* Fill in the Blank Input Fields */
+.fill-blank-input {
+    display: inline-block;
+    width: auto; /* Dynamic width based on the input content */
+    min-width: 120px; /* Ensure a minimum size for better UX */
+    padding: 10px;
+    margin: 0 5px; /* Spacing between the text parts and inputs */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #2c3e50;
+    background-color: #ffffff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    text-align: center; /* Center align text for a clean look */
+}
+
+.fill-blank-input:focus {
+    border-color: #1abc9c; /* Highlight border on focus */
+    box-shadow: 0 0 6px rgba(26, 188, 156, 0.5); /* Add a glow effect */
+    outline: none; /* Remove default outline */
+}
+
+.fill-blank-input::placeholder {
+    color: #95a5a6; /* Subtle gray for placeholder */
+    font-style: italic; /* Placeholder text in italic for distinction */
+}
+
+/* Styling for Fill-in-the-Blank Section */
+.question h2 .fill-blank-input {
+    vertical-align: middle; /* Align inputs with text */
+    margin-bottom: 0; /* Avoid extra margin */
+}
+
+/* Hover Effect */
+.fill-blank-input:hover {
+    border-color: #16a085; /* Slightly darker green on hover */
+}
+
+/* Accessibility Enhancements */
+.fill-blank-input:focus-visible {
+    outline: 2px solid #1abc9c; /* Ensure focus is visible for keyboard users */
+    outline-offset: 2px; /* Add spacing between the outline and the input */
+}
+
 /* Input Fields */
 .text-answer-box {
     width: 100%;
