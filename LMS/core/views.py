@@ -38,6 +38,7 @@ import re  # To use regular expressions for bracket extraction
 from django.db.models import Q
 from django.http import JsonResponse
 import json
+from difflib import SequenceMatcher  # For approximate string matching
 
 
 User = get_user_model()
@@ -609,7 +610,7 @@ def completed_test_view(request, test_gid):
             }
             original_question = Question.objects.get(question=question.question)
             
-            if question.answerType == 'Text':
+            if question.answerType == 'Text' or question.answerType == 'Fill in Blanks':
                 selected_answer = completed_test_answer.filter(question=question).first()
                 rightAnswer = original_question.rightAnswer
                 is_correct = selected_answer.is_correct if selected_answer else False
@@ -1235,6 +1236,40 @@ def submitTest(request, test_gid):
                             score += weight
                             completedTestAnswer.is_correct = True
                             completedTestAnswer.save()
+
+                    elif question.answerType == "Fill in Blanks":
+                        # Fill-in-the-blank question logic
+                        completedTestAnswer = CompletedTestAnswer.objects.create(
+                            question=question,
+                            completedTest=completedTest,
+                            is_correct=False,
+                            text=selected_answer_input
+                        )
+                        
+                        # Split both user's input and correct answers
+                        user_answers = [ans.strip() for ans in selected_answer_input.split(',')]
+                        correct_answers = [ans.strip() for ans in question.rightAnswer.answer.split(',')]
+                        
+                        if len(user_answers) == len(correct_answers):
+                            correct_count = 0
+                            n = len(correct_answers)
+
+                            for user_ans, correct_ans in zip(user_answers, correct_answers):
+                                if SequenceMatcher(
+                                    None,
+                                    user_ans.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', ''),
+                                    correct_ans.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', '')
+                                ).ratio() > 0.9:
+                                    correct_count += 1
+
+                            if correct_count > 0:
+                                weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
+                                partial_score = weight * (correct_count / n)
+                                score += partial_score
+                                if correct_count == n:
+                                    completedTestAnswer.is_correct = True
+                            completedTestAnswer.save()
+
                     else:
                         try:
                             selected_answer = Attribute.objects.get(gid=selected_answer_input)

@@ -9,7 +9,7 @@
 {% block content %}
             <section class="completed-test">
                 <h1>{{ test_name }}</h1>
-                <p>Score: {{ score }}</p>
+                <p>Score: {{ score|floatformat:2 }}</p>
                 <p>Completed on: {{ completion_date|date:"d/m/Y" }}</p>
                 
                 {% for question in questions_info %}
@@ -17,14 +17,14 @@
                         <h2>{{ question.question_text }}</h2>
                         <h3>Weight (0-1): {{ question.question_weight }}</h3>
                         <ul>
-                            {% if question.question_type == "Text" %}
+                            {% if question.question_type == "Text" or question.question_type == "Fill in Blanks" %}
                                 <!-- Display the correct and student's text answers for "Text" type questions -->
                                 <label>Your Answer:</label>
                                 {% for attribute in question.attributes %}
                                     <input type="text" value="{{ attribute.answer_text }}" disabled
                                         class="{% if attribute.is_correct %}correct{% else %}incorrect{% endif %}">
 
-                                    {% if attribute.answer_text != attribute.rightAnswer %}
+                                    {% if attribute.is_correct != 1 %}
                                         <p class="correct-answer">Correct Answer: <span class="correct">{{ attribute.rightAnswer }}</span></p>
                                     {% endif %}
                                 {% endfor %}

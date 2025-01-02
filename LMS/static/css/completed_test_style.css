@@ -106,6 +106,18 @@ li.incorrect {
     font-weight: bold;
 }
 
+/* Correct and Incorrect Feedback */
+.correct {
+    color: rgb(1, 202, 1);
+    font-weight: bold;
+}
+
+.incorrect {
+    color: red;
+    font-weight: bold;
+}
+
+
 .correct-answer {
     margin-top: 10px;
     font-size: 14px;

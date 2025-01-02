@@ -9,7 +9,7 @@
 {% block content %}
             <section class="complete-test">
                 <h1>{{ test.test_name }}</h1>
-                <form action="{% url 'submitTest' test_gid=test.gid %}" method="post">
+                <form id="testForm" action="{% url 'submitTest' test_gid=test.gid %}" method="post">
                     {% csrf_token %}
                     {% for question in questions %}
                         <div class="question">
@@ -18,9 +18,11 @@
                                     {% for part in question.parts %}
                                         {{ part }}
                                         {% if not forloop.last %}
-                                            <input type="text" name="{{ question.gid }}-{{ forloop.counter }}" class="fill-blank-input" placeholder="Fill in the blank">
+                                            <input type="text" class="fill-blank-input" data-question-id="{{ question.gid }}" placeholder="Fill in the blank">
                                         {% endif %}
                                     {% endfor %}
+                                    <!-- Hidden input to store the combined string -->
+                                    <input type="hidden" name="{{ question.gid }}" id="hidden-{{ question.gid }}">
                                 {% else %}
                                     {{ question.question_text }}
                                 {% endif %}
@@ -47,4 +49,32 @@
                     <button type="submit" class="submit-button">Submit Test</button>
                 </form>
             </section>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    document.getElementById('testForm').addEventListener('submit', function (e) {
+        // Find all questions with blanks
+        const questions = document.querySelectorAll('.fill-blank-input');
+        
+        // Group inputs by question ID and combine their values
+        const questionAnswers = {};
+        questions.forEach(input => {
+            const questionId = input.getAttribute('data-question-id');
+            if (!questionAnswers[questionId]) {
+                questionAnswers[questionId] = [];
+            }
+            questionAnswers[questionId].push(input.value.trim()); // Trim whitespace
+        });
+
+        // Populate hidden inputs with the combined values
+        Object.keys(questionAnswers).forEach(questionId => {
+            const combinedAnswer = questionAnswers[questionId].join(','); // Join answers with commas
+            const hiddenInput = document.getElementById(`hidden-${questionId}`);
+            if (hiddenInput) {
+                hiddenInput.value = combinedAnswer;
+            }
+        });
+        alert(combinedAnswer);
+    });
+</script>
 {% endblock %}
