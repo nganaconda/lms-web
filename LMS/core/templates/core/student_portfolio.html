@@ -26,7 +26,7 @@
                         {% for test in tests_info %}
                             <tr>
                                 <td><a href="{% url 'completed_test' test.completed_test_gid %}">{{ test.name }}</a></td>
-                                <td>{{ test.score }}</td>
+                                <td>{{ test.score|floatformat:2 }}</td>
                                 <td>{{ test.date|date:"d/m/Y" }}</td>
                             </tr>
                         {% empty %}

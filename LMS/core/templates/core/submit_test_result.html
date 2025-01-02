@@ -1,0 +1,65 @@
+{% extends 'core/stud_base.html' %}
+
+{% block title %}{{ test_name }} - Test Completed{% endblock %}
+
+{% block content %}
+<div id="popup" class="popup">
+    <h2>Congratulations!</h2>
+    <p>You have completed the test.</p>
+    <p>Your Score: {{ score }}%</p>
+</div>
+
+<script>
+    // Show the popup for a few seconds, then redirect
+    const popup = document.getElementById('popup');
+    popup.style.display = 'block';
+
+    setTimeout(() => {
+        window.location.href = "{% url 'newTests' %}";
+    }, 5000); // Redirect after 5 seconds
+
+    // Add a close button to the popup
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    closeButton.onclick = () => {
+        popup.style.display = 'none';
+        window.location.href = "{% url 'newTests' %}";
+    };
+    popup.appendChild(closeButton);
+</script>
+
+<style>
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #1abc9c; /* Accent color */
+    border: 1px solid #1abc9c; /* Match border */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #16a085; /* Slightly darker shade on hover */
+    border-color: #16a085;
+}
+
+button:active {
+    transform: scale(0.98); /* Slight button press effect */
+}
+</style>
+{% endblock %}

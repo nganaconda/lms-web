@@ -39,6 +39,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 import json
 from difflib import SequenceMatcher  # For approximate string matching
+from django.shortcuts import render
 
 
 User = get_user_model()
@@ -1295,8 +1296,11 @@ def submitTest(request, test_gid):
             completedTest.score = score_percentage
             completedTest.save()
             
-            messages.success(request, f'Test completed successfully! Your score: {score_percentage}%')
-            return redirect('newTests')
+            # Render the page with the score included in context
+            return render(request, 'core/submit_test_result.html', {
+                'test_name': test.test_name,
+                'score': score_percentage
+            })
 
     except Users.DoesNotExist:
         return redirect('403.html')  # Or handle as appropriate
