@@ -146,6 +146,7 @@ class Question(models.Model):
     
     ANSWER_TYPE_CHOICES = [
         (SINGLE_CHOICE, 'Single Choice'),
+        (MULTIPLE_CHOICE, 'Multiple Choice'),
         (TEXT, 'Text'),
         (FILL_IN_BLANKS, 'Fill in Blanks'),
     ]

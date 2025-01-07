@@ -193,6 +193,7 @@
                     rightAnswerText.readOnly = false;
                     addAttributeButton.innerText = 'Add Another Attribute';
                     questionInput.setAttribute('placeholder', ''); // Clear placeholder if not needed
+                    rightAnswerText.setAttribute('placeholder', '');
                 } else if (answerTypeField.value === 'Fill in Blanks') {
                     // Hide attributes and show instruction for Fill in Blanks
                     attributesContainer.style.display = 'none';
@@ -205,6 +206,18 @@
                         'placeholder',
                         'Please include the correct answer in brackets within the question text.'
                     );
+                    rightAnswerText.setAttribute('placeholder', '');
+                } else if (answerTypeField.value === 'Multiple Choice') {
+                    attributesContainer.style.display = 'block';
+                    addAttributeButton.style.display = 'inline-block';
+                    idAttributesTitle.style.display = 'block';
+                    fillInBlankSection.style.display = 'none';
+                    rightAnswerSection.style.display = 'block';
+                    rightAnswerText.readOnly = false;
+                    rightAnswerText.setAttribute('placeholder', 'Enter correct answers, separated by commas');
+                    // Update placeholder and instructions for Multiple Choice
+                    addAttributeButton.innerText = 'Add Another Attribute';
+                    questionInput.setAttribute('placeholder', ''); // Clear placeholder
                 } else {
                     // Show the attributes section and "Add Another Attribute" button
                     attributesContainer.style.display = 'block';
@@ -215,6 +228,7 @@
                     rightAnswerText.readOnly = false;
                     addAttributeButton.innerText = 'Add Another Attribute';
                     questionInput.setAttribute('placeholder', ''); // Clear placeholder if not needed
+                    rightAnswerText.setAttribute('placeholder', '');
                 }
             }
 

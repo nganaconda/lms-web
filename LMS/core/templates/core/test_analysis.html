@@ -16,6 +16,18 @@
                         <h2>{{ question.question_text }}</h2>
                         <h3>Weight (0-1): {{ question.question_weight }}</h3>
                         <ul>
+                            {% if question.question_type == 'Multiple Choice' %}
+                                {% for attribute in question.correct_answers %}
+                                    <li>
+                                        <input 
+                                            type="radio" 
+                                            disabled checked>
+                                        <label class="{% if attribute.is_correct %}correct-attribute{% endif %}">
+                                            {{ attribute }}
+                                        </label>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}  
                             {% for attribute in question.attributes %}
                                 <li>
                                     {% if question.question_type == "Text" %}

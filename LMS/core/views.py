@@ -679,6 +679,7 @@ def test_view(request, test_gid):
                 'question_text': question.question,
                 'question_weight': get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', '')),
                 'question_type': question.answerType,
+                'correct_answers': [ans.strip() for ans in question.rightAnswer.answer.split(',')],  # For Multiple Choice
                 'attributes': []
             }
             original_question = Question.objects.get(question=question.question)
@@ -686,7 +687,10 @@ def test_view(request, test_gid):
             for attribute in attributes:
                 # Find the selected answer and whether it was correct
                 rightAnswer = original_question.rightAnswer
-                
+                if question.answerType == 'Multiple Choice':
+                    if attribute.answer == question.rightAnswer.answer:
+                        continue
+                    
                 question_data['attributes'].append({
                     'answer_text': attribute.answer,
                     'rightAnswer': rightAnswer.answer
@@ -768,6 +772,7 @@ def viewCreated(request, test_gid):
             question_data = {
                 'question_text': question.question,
                 'question_type': question.answerType,
+                'correct_answers': [ans.strip() for ans in question.rightAnswer.answer.split(',')],  # For Multiple Choice
                 'weight': get_test_question(testgid, questiongid),
                 'gid': question.gid,
                 'attributes': []
@@ -776,7 +781,9 @@ def viewCreated(request, test_gid):
             for attribute in attributes:
                 # Find the selected answer and whether it was correct
                 rightAnswer = original_question.rightAnswer
-                
+                if question.answerType == 'Multiple Choice':
+                    if attribute.answer == question.rightAnswer.answer:
+                        continue
                 question_data['attributes'].append({
                     'answer_text': attribute.answer,
                     'rightAnswer': rightAnswer.answer
@@ -1103,10 +1110,15 @@ def question_analysis(request, type, question_gid):
             'question_text': question.question,
             'difficulty': question.difficulty,
             'rightanswer': question.rightAnswer.answer,
+            'correct_answers': [ans.strip() for ans in question.rightAnswer.answer.split(',')],  # For Multiple Choice
+            'answerType': question.answerType,
             'attributes': []
         }
         
-        for attribute in attributes:            
+        for attribute in attributes:    
+            if question.answerType == 'Multiple Choice':
+                if attribute.answer == question.rightAnswer.answer:
+                    continue
             question_data['attributes'].append({
                 'answer_text': attribute.answer
             })

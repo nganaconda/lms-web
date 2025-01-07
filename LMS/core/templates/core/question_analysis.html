@@ -10,13 +10,39 @@
             <section class="question_attributes">
                 <h1>{{ question_data.question_text }}</h1>
                 <p>Difficulty: {{ question_data.difficulty }}</p>
-                <p>Correct answer: {{ question_data.rightanswer }}</p>                
+                {% if question_data.answerType == 'Multiple Choice' %}
+                    <h2>Correct Answers:</h2>
+                    <ul>
+                        {% for answer in question_data.correct_answers %}
+                            <li class="correct-answer">{{ answer }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Correct Answer: {{ question_data.rightanswer }}</p>
+                {% endif %}          
                 <h2>Attributes</h2>
                 <ul>
+                    {% if question_data.answerType == 'Multiple Choice' %}
+                        {% for attribute in question_data.correct_answers %}
+                            <li>
+                                <input 
+                                    type="radio" 
+                                    disabled checked>
+                                <label class="{% if attribute.is_correct %}correct-attribute{% endif %}">
+                                    {{ attribute }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    {% endif %}  
                     {% for attribute in question_data.attributes %}
                         <li>
-                            <input type="radio" disabled>
-                            <label>{{ attribute.answer_text }}</label>
+                            <input 
+                                type="radio" 
+                                disabled 
+                                {% if attribute.is_correct %}checked{% endif %}>
+                            <label class="{% if attribute.is_correct %}correct-attribute{% endif %}">
+                                {{ attribute.answer_text }}
+                            </label>
                         </li>
                     {% endfor %}
                 </ul>

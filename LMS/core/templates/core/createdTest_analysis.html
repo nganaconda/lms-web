@@ -32,6 +32,17 @@
                                 </div>
                                 
                                 <ul>
+                                    {% if question.question_type == "Multiple Choice" %}
+                                        {% for attribute in question.correct_answers %}
+                                            <li>
+                                                <input type="radio" checked disabled>
+                                                <label class="{% if attribute.is_correct %}correct-attribute{% endif %}">
+                                                    {{ attribute }}
+                                                </label>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}  
+                                    
                                     {% if question.question_type == "Text" %}
                                         {% for attribute in question.attributes %}
                                             <input type="text" value="{{ attribute.answer_text }}" disabled>
@@ -113,26 +124,34 @@
                     const radioGroupName = `question-${questionId}-attributes`;
 
                     data.attributes.forEach((attribute) => {
-                        // Create list item
-                        const li = document.createElement('li');
+                        // Check if the answer contains commas (comma-separated values)
+                        const answers = attribute.answer.includes(',')
+                            ? attribute.answer.split(',').map(ans => ans.trim()) // Split and trim each answer
+                            : [attribute.answer]; // If no commas, use the answer as a single item in the array
+                        
+                        // Loop through each split answer and display it as a separate list item
+                        answers.forEach((splitAnswer) => {
+                            // Create list item
+                            const li = document.createElement('li');
 
-                        // Create radio button
-                        const radioInput = document.createElement('input');
-                        radioInput.type = 'radio';
-                        radioInput.name = radioGroupName; // Group radios by question
-                        radioInput.value = attribute.gid; // Use the attribute's ID as the value
-                        radioInput.disabled = true;
+                            // Create radio button
+                            const radioInput = document.createElement('input');
+                            radioInput.type = 'radio';
+                            radioInput.name = radioGroupName; // Group radios by question
+                            radioInput.value = splitAnswer; // Use the split answer as the value
+                            radioInput.disabled = true;
 
-                        // Create label
-                        const label = document.createElement('label');
-                        label.textContent = attribute.answer; // Set the label text
+                            // Create label
+                            const label = document.createElement('label');
+                            label.textContent = splitAnswer; // Set the label text to the split answer
 
-                        // Append the radio button and label to the list item
-                        li.appendChild(radioInput);
-                        li.appendChild(label);
+                            // Append the radio button and label to the list item
+                            li.appendChild(radioInput);
+                            li.appendChild(label);
 
-                        // Append the list item to the attributes list
-                        attributesList.appendChild(li);
+                            // Append the list item to the attributes list
+                            attributesList.appendChild(li);
+                        });
                     });
                 });
 
