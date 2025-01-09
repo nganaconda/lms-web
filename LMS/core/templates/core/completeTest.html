@@ -42,6 +42,20 @@
                                             <label for="{{ attribute.gid }}">{{ attribute.answer_text }}</label>
                                         </li>
                                     {% endfor %}
+                                {% elif question.question_type == "Multiple Choice" %}
+                                    {% for attribute in question.correct_answers %}
+                                        <li>
+                                            <input type="checkbox" name="{{ question.gid }}" value="{{ attribute }}" id="{{ attribute.gid }}">
+                                            <label for="{{ attribute.gid }}">{{ attribute }}</label>
+                                        </li>
+                                    {% endfor %}  
+                                    {% for attribute in question.attributes %}
+                                        <li>
+                                            <input type="checkbox" name="{{ question.gid }}" value="{{ attribute.gid }}" id="{{ attribute.gid }}">
+                                            <label for="{{ attribute.gid }}">{{ attribute.answer_text }}</label>
+                                        </li>
+                                    {% endfor %}
+                                    <input type="hidden" name="{{ question.gid }}" id="hidden-{{ question.gid }}">
                                 {% endif %}
                             </ul>
                         </div>
@@ -55,6 +69,28 @@
     document.getElementById('testForm').addEventListener('submit', function (e) {
         // Find all questions with blanks
         const questions = document.querySelectorAll('.fill-blank-input');
+        
+        // Collect selected answers for Multiple Choice questions
+        const multipleChoiceQuestions = document.querySelectorAll('input[type="checkbox"]:checked');
+        const multipleChoiceAnswers = {};
+
+        multipleChoiceQuestions.forEach((checkbox) => {
+            const questionId = checkbox.name;
+            if (!multipleChoiceAnswers[questionId]) {
+                multipleChoiceAnswers[questionId] = [];
+            }
+            multipleChoiceAnswers[questionId].push(checkbox.value.trim()); // Collect selected values
+        });
+
+        // Add combined multiple-choice answers to the form
+        Object.keys(multipleChoiceAnswers).forEach((questionId) => {
+            const combinedAnswer = multipleChoiceAnswers[questionId].join(','); // Join selected values with commas
+            // Add a hidden input field for each question
+            let hiddenInput = document.getElementById(`hidden-${questionId}`);
+            if (hiddenInput) {
+                hiddenInput.value = combinedAnswer;
+            }
+        });
         
         // Group inputs by question ID and combine their values
         const questionAnswers = {};

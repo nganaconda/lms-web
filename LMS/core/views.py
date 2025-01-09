@@ -621,6 +621,41 @@ def completed_test_view(request, test_gid):
                     'is_correct': is_correct,
                     'rightAnswer': rightAnswer.answer,
                 })
+
+            elif question.answerType == 'Multiple Choice':
+                # Split the correct answers by commas
+                right_answers = [answer.strip() for answer in original_question.rightAnswer.answer.split(',')]
+                
+                # Collect all selected answers for this question
+                selected_answer = completed_test_answer.filter(question=question).first()
+                selected_answer_texts = [answer.strip() for answer in selected_answer.text.split(',')]
+
+                for answer in right_answers:
+                    answer_text = answer
+                    is_selected = answer_text in selected_answer_texts
+                    is_correct = True
+
+                    question_data['attributes'].append({
+                        'answer_text': answer,
+                        'is_selected': is_selected,
+                        'is_correct': is_correct,
+                    })
+
+                # Prepare data for each attribute based on text comparison
+                for attribute in attributes:
+                    answer_text = attribute.answer.strip()
+                    is_selected = answer_text in selected_answer_texts
+                    is_correct = answer_text in right_answers
+
+                    if attribute.answer == original_question.rightAnswer.answer:
+                        continue 
+
+                    question_data['attributes'].append({
+                        'answer_text': answer_text,
+                        'is_selected': is_selected,
+                        'is_correct': is_correct,
+                    })
+
             else:
                 for attribute in attributes:
                     # Find the selected answer and whether it was correct
@@ -1169,6 +1204,7 @@ def completeTest(request, test_gid):
                     "parts": parts,
                     "question_weight": get_test_question(testgid, questiongid),
                     "question_type": question.answerType,
+                    'correct_answers': '',  # For Multiple Choice
                     'attributes': []
                 }
             else:
@@ -1177,6 +1213,7 @@ def completeTest(request, test_gid):
                     'gid': question.gid,
                     'question_weight': get_test_question(testgid, questiongid),
                     'question_type': question.answerType,
+                    'correct_answers': [ans.strip() for ans in question.rightAnswer.answer.split(',')],  # For Multiple Choice
                     'attributes': []
                 }
             
@@ -1184,6 +1221,10 @@ def completeTest(request, test_gid):
                 # Find the selected answer and whether it was correct
                 rightAnswer = original_question.rightAnswer
                 
+                if question.answerType == 'Multiple Choice':
+                    if attribute.answer == question.rightAnswer.answer:
+                        continue
+
                 question_data['attributes'].append({
                     'gid': attribute.gid,
                     'answer_text': attribute.answer,
@@ -1252,6 +1293,39 @@ def submitTest(request, test_gid):
 
                     elif question.answerType == "Fill in Blanks":
                         # Fill-in-the-blank question logic
+                        completedTestAnswer = CompletedTestAnswer.objects.create(
+                            question=question,
+                            completedTest=completedTest,
+                            is_correct=False,
+                            text=selected_answer_input
+                        )
+                        
+                        # Split both user's input and correct answers
+                        user_answers = [ans.strip() for ans in selected_answer_input.split(',')]
+                        correct_answers = [ans.strip() for ans in question.rightAnswer.answer.split(',')]
+                        
+                        if len(user_answers) == len(correct_answers):
+                            correct_count = 0
+                            n = len(correct_answers)
+
+                            for user_ans, correct_ans in zip(user_answers, correct_answers):
+                                if SequenceMatcher(
+                                    None,
+                                    user_ans.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', ''),
+                                    correct_ans.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', '')
+                                ).ratio() > 0.9:
+                                    correct_count += 1
+
+                            if correct_count > 0:
+                                weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
+                                partial_score = weight * (correct_count / n)
+                                score += partial_score
+                                if correct_count == n:
+                                    completedTestAnswer.is_correct = True
+                            completedTestAnswer.save()
+                    
+                    elif question.answerType == "Multiple Choice":
+                        # Multiple Choice question logic
                         completedTestAnswer = CompletedTestAnswer.objects.create(
                             question=question,
                             completedTest=completedTest,

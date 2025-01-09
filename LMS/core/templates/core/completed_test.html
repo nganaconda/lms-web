@@ -28,8 +28,16 @@
                                         <p class="correct-answer">Correct Answer: <span class="correct">{{ attribute.rightAnswer }}</span></p>
                                     {% endif %}
                                 {% endfor %}
+                            {% elif question.question_type == "Multiple Choice" %}
+                                <!-- Display the choices for single choice questions -->
+                                {% for attribute in question.attributes %}
+                                    <li class="{% if attribute.is_correct %}correct{% endif %} {% if attribute.is_selected and not attribute.is_correct %}incorrect{% endif %}">
+                                        <input type="radio" {% if attribute.is_selected %}checked{% endif %} disabled>
+                                        <label>{{ attribute.answer_text }}</label>
+                                    </li>
+                                {% endfor %}
                             {% else %}
-                                <!-- Display the choices for multiple choice questions -->
+                                <!-- Display the choices for single choice questions -->
                                 {% for attribute in question.attributes %}
                                     <li class="{% if attribute.answer_text == attribute.rightAnswer %}correct{% endif %} {% if attribute.is_selected and not attribute.is_correct %}incorrect{% endif %}">
                                         <input type="radio" {% if attribute.is_selected %}checked{% endif %} disabled>

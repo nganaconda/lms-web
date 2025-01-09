@@ -169,6 +169,13 @@ main {
     accent-color: #1abc9c; /* Modern styling for radio buttons */
 }
 
+/* Radio Buttons */
+.question input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2); /* Slightly larger for accessibility */
+    accent-color: #1abc9c; /* Modern styling for radio buttons */
+}
+
 /* Footer Styling */
 footer {
     text-align: center;
