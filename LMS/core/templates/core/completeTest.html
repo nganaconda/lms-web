@@ -51,7 +51,7 @@
                                     {% endfor %}  
                                     {% for attribute in question.attributes %}
                                         <li>
-                                            <input type="checkbox" name="{{ question.gid }}" value="{{ attribute.gid }}" id="{{ attribute.gid }}">
+                                            <input type="checkbox" name="{{ question.gid }}" value="{{ attribute.answer_text }}" id="{{ attribute.gid }}">
                                             <label for="{{ attribute.gid }}">{{ attribute.answer_text }}</label>
                                         </li>
                                     {% endfor %}
