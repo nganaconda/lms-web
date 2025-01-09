@@ -1337,25 +1337,20 @@ def submitTest(request, test_gid):
                         user_answers = [ans.strip() for ans in selected_answer_input.split(',')]
                         correct_answers = [ans.strip() for ans in question.rightAnswer.answer.split(',')]
                         
-                        if len(user_answers) == len(correct_answers):
-                            correct_count = 0
-                            n = len(correct_answers)
+                        correct_count = 0
+                        n = len(correct_answers)
 
-                            for user_ans, correct_ans in zip(user_answers, correct_answers):
-                                if SequenceMatcher(
-                                    None,
-                                    user_ans.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', ''),
-                                    correct_ans.lower().replace('-', '').replace('\'', '').replace(' ', '').replace('.', '').replace(',', '').replace('!', '')
-                                ).ratio() > 0.9:
-                                    correct_count += 1
+                        for user_ans in user_answers:
+                            if user_ans in correct_answers:
+                                correct_count += 1
 
-                            if correct_count > 0:
-                                weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
-                                partial_score = weight * (correct_count / n)
-                                score += partial_score
-                                if correct_count == n:
-                                    completedTestAnswer.is_correct = True
-                            completedTestAnswer.save()
+                        if correct_count > 0:
+                            weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
+                            partial_score = weight * (correct_count / n)
+                            score += partial_score
+                            if correct_count == n:
+                                completedTestAnswer.is_correct = True
+                        completedTestAnswer.save()
 
                     else:
                         try:
