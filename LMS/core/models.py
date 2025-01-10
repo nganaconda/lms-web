@@ -212,3 +212,26 @@ class TestQuestion(models.Model):
     
     def __str__(self):
         return f"TestQuestion {self.gid} - weight: {self.weight}, question: {self.question.gid}, test: {self.test.gid}"
+    
+
+class Tag(models.Model):
+    class Meta:
+        db_table = 'tags'
+
+    gid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tag_name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return f"Tag {self.gid} - tag_name: {self.tag_name}"
+    
+
+class TestTag(models.Model):
+    class Meta:
+        db_table = 'tests_tags'
+
+    tag = models.ForeignKey(Tag, related_name='test_tags', on_delete=models.CASCADE)
+    test = models.ForeignKey(Test, related_name='test_tags', on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"TestTag - tag: {self.tag.gid}, test: {self.test.gid}"
+    

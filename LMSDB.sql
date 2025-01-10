@@ -481,3 +481,16 @@ CREATE TABLE completedTestAnswers (
     FOREIGN KEY (attribute_id) REFERENCES Attributes(gid),
     FOREIGN KEY (completedTest_id) REFERENCES completedTests(gid)
 );
+
+CREATE TABLE tags (
+    gid CHAR(36) PRIMARY KEY NOT NULL,
+    tag_name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE tests_tags (
+    test_id CHAR(36) NOT NULL,
+    tag_id CHAR(36) NOT NULL,
+    PRIMARY KEY (test_id, tag_id),
+    FOREIGN KEY (test_id) REFERENCES Tests(gid),
+    FOREIGN KEY (tag_id) REFERENCES Tags(gid)
+);
