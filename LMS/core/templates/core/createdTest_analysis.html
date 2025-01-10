@@ -64,8 +64,14 @@
                         <label for="add-question-select">Add a Question:</label>
                         <select id="add-question-select">
                             <option value="" disabled selected>Select a question</option>
-                            {% for question in available_questions %}
-                                <option value="{{ question.gid }}">{{ question.question }}</option>
+                            {% for type in unique_question_types %}
+                                <optgroup label="{{ type }}">
+                                    {% for question in available_questions %}
+                                        {% if question.type == type %}
+                                            <option value="{{ question.gid }}">{{ question.question }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </optgroup>
                             {% endfor %}
                         </select>
                         <button id="add-question-btn">Add Question</button>
@@ -109,8 +115,14 @@
             // Add to the question list
             questionList.appendChild(questionItem);
 
-            // Remove the option from the dropdown
-            addQuestionSelect.removeChild(selectedOption);
+            // Remove the selected question from the dropdown
+            const optGroup = selectedOption.parentElement;
+            optGroup.removeChild(selectedOption);
+
+            // Remove the optgroup if it's empty
+            if (optGroup.children.length === 0) {
+                addQuestionSelect.removeChild(optGroup);
+            }
 
             // Fetch and display attributes dynamically
             fetch(`/questions/${questionId}/attributes/`)
@@ -167,23 +179,6 @@
             adjustWeights();
         }
     });
-
-    function removeQuestion(questionId, questionText) {
-        // Remove the question item from the list
-        const questionItem = document.querySelector(`.question-item[data-question-id="${questionId}"]`);
-        questionList.removeChild(questionItem);
-
-        // Add the option back to the dropdown
-        const newOption = document.createElement('option');
-        newOption.value = questionId;
-        newOption.text = questionText;
-        addQuestionSelect.appendChild(newOption);
-
-        // Send to the backend
-        updateTestQuestion('remove', questionId);
-        // Adjust weights dynamically
-        adjustWeights();
-    }
 
     function updateTestQuestion(action, questionId) {
         fetch(`/test/{{ test_gid }}/update-questions/`, {
@@ -261,13 +256,30 @@
         const questionItem = document.querySelector(`.question-item[data-question-id="${questionId}"]`);
         questionList.removeChild(questionItem);
 
-        // Add the option back to the dropdown for user-added questions
-        if (!document.querySelector(`option[value="${questionId}"]`)) {
-            const newOption = document.createElement('option');
-            newOption.value = questionId;
-            newOption.text = questionText;
-            addQuestionSelect.appendChild(newOption);
-        }
+        // Determine the type of the question (use the backend API or store types locally)
+        fetch(`/questions/${questionId}/type/`)
+            .then(response => response.json())
+            .then(data => {
+                const questionType = data.type;
+
+                // Find the corresponding optgroup
+                let optGroup = Array.from(addQuestionSelect.querySelectorAll('optgroup')).find(
+                    group => group.label === questionType
+                );
+
+                // If the optgroup doesn't exist, create it
+                if (!optGroup) {
+                    optGroup = document.createElement('optgroup');
+                    optGroup.label = questionType;
+                    addQuestionSelect.appendChild(optGroup);
+                }
+
+                // Add the option back to the optgroup
+                const newOption = document.createElement('option');
+                newOption.value = questionId;
+                newOption.text = questionText;
+                optGroup.appendChild(newOption);
+            });
 
         // Send to the backend
         updateTestQuestion('remove', questionId);

@@ -38,6 +38,7 @@ urlpatterns = [
     path('tests/viewCreated/<str:test_gid>/', views.viewCreated, name='viewCreated'),
     path('test/<uuid:test_gid>/update-questions/', views.updateTestQuestions, name='update_test_questions'),
     path('questions/<str:question_gid>/attributes/', views.get_question_attributes, name='get_question_attributes'),
+    path('questions/<str:question_gid>/type/', views.get_question_type, name='get_question_type'),
     path('tests/remake/<str:test_gid>/', views.remakeTest, name='remakeTest'),
     path('tests/saveTestWeights/<str:test_gid>/', views.save_test_weights, name='save_test_weights'),
     path('test/<uuid:test_gid>/', views.completeTest, name='completeTest'),

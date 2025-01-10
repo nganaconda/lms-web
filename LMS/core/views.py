@@ -40,6 +40,7 @@ from django.http import JsonResponse
 import json
 from difflib import SequenceMatcher  # For approximate string matching
 from django.shortcuts import render
+from collections import defaultdict
 
 
 User = get_user_model()
@@ -795,6 +796,8 @@ def viewCreated(request, test_gid):
 
         # Fetch available questions (not already in the test)
         available_questions = Question.objects.filter(~Q(gid__in=existing_question_gids))
+        # Get all unique question types
+        unique_question_types = available_questions.values_list('type', flat=True).distinct() 
         
         # Iterate through each question in the test
         for question in test_questions:
@@ -831,7 +834,8 @@ def viewCreated(request, test_gid):
             'test_name': test.test_name,
             'createdAt': test.createdAt,
             'questions_info': questions_info,
-            'available_questions': available_questions,
+            'available_questions': available_questions,  # Pass categorized questions
+            'unique_question_types': unique_question_types,
             'test_gid': test.gid
         }
         
@@ -1669,3 +1673,8 @@ def viewTestResults(request, test_gid, class_group_id, type):
 
     except Users.DoesNotExist:
         return redirect('403.html')
+    
+
+def get_question_type(request, question_gid):
+    question = get_object_or_404(Question, gid=question_gid)
+    return JsonResponse({'type': question.type})
