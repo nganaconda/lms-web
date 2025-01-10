@@ -1343,6 +1343,8 @@ def submitTest(request, test_gid):
                         for user_ans in user_answers:
                             if user_ans in correct_answers:
                                 correct_count += 1
+                            elif correct_count > 0:
+                                correct_count -= 1
 
                         if correct_count > 0:
                             weight = get_test_question(str(test_gid).replace('-', ''), str(question.gid).replace('-', ''))
@@ -1372,7 +1374,7 @@ def submitTest(request, test_gid):
                             pass
             
             # Calculate the score as a percentage
-            score_percentage = score * 10
+            score_percentage = round(score * 10, 2)
 
             completedTest.score = score_percentage
             completedTest.save()
