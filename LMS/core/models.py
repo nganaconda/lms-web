@@ -229,7 +229,7 @@ class TestTag(models.Model):
     class Meta:
         db_table = 'tests_tags'
 
-    tag = models.ForeignKey(Tag, related_name='test_tags', on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, related_name='test_tags', on_delete=models.CASCADE, primary_key=True)
     test = models.ForeignKey(Test, related_name='test_tags', on_delete=models.CASCADE)
     
     def __str__(self):

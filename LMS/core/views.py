@@ -28,7 +28,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 import uuid
-from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup, TestQuestion
+from core.models import Test, Question, Attribute, Users, Professor, Student, CompletedTest, CompletedTestAnswer, ClassGroup, TestQuestion, Tag, TestTag
 from .forms import QuestionForm, AttributeFormSet, TestForm
 import random
 import math
@@ -280,13 +280,17 @@ def portfolio(request):
                 # Prepare a list of tests with their GIDs and names
                 tests_info = []
                 for completed_test in completed_tests:
+                    testtags = TestTag.objects.filter(test=completed_test.test).select_related('tag')
+
                     test = completed_test.test
+                    tags = [testtag.tag for testtag in testtags]  # Extract tag names
                     tests_info.append({
                         'gid': test.gid,
                         'name': test.test_name,
                         'score': completed_test.score,
                         'date': test.createdAt,
-                        'completed_test_gid': completed_test.gid
+                        'completed_test_gid': completed_test.gid,
+                        'tags': tags  # Include tag names
                     })
                 
                 # Add the list to the context

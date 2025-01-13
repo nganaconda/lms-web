@@ -24,8 +24,15 @@
                     </thead>
                     <tbody>
                         {% for test in tests_info %}
-                            <tr>
-                                <td><a href="{% url 'completed_test' test.completed_test_gid %}">{{ test.name }}</a></td>
+                            <tr class="test-row" data-tags="{{ test.tags|join:' ' }}">
+                                <td>
+                                    <a href="{% url 'completed_test' test.completed_test_gid %}">{{ test.name }}</a>
+                                    <div class="tags">
+                                        {% for tag in test.tags %}
+                                            <button class="tag-btn" data-tag="{{ tag.tag_name }}">{{ tag.tag_name }}</button>
+                                        {% endfor %}
+                                    </div>
+                                </td>
                                 <td>{{ test.score|floatformat:2 }}</td>
                                 <td>{{ test.date|date:"d/m/Y" }}</td>
                             </tr>
@@ -37,4 +44,35 @@
                     </tbody>
                 </table>
             </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tagButtons = document.querySelectorAll('.tag-btn');
+        const testRows = document.querySelectorAll('.test-row');
+
+        tagButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const selectedTag = button.getAttribute('data-tag');
+                const isActive = button.classList.contains('active');
+
+                // Toggle active state
+                tagButtons.forEach(btn => btn.classList.remove('active'));
+                if (!isActive) button.classList.add('active');
+
+                // Filter tests
+                const filterTag = isActive ? null : selectedTag;
+                testRows.forEach(row => {
+                    const rowTags = row.getAttribute('data-tags');
+                    if (filterTag && !rowTags.includes(filterTag)) {
+                        row.style.display = 'none';
+                    } else {
+                        row.style.display = '';
+                    }
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}
