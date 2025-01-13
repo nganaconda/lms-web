@@ -337,10 +337,13 @@ def newTests(request):
                             isCompleted = True
                     
                     if isCompleted == False:
+                        testtags = TestTag.objects.filter(test=test).select_related('tag')
+                        tags = [testtag.tag for testtag in testtags]  # Extract tag names
                         tests_info.append({
                             'gid': test.gid,
                             'name': test.test_name,
                             'date': test.createdAt,
+                            'tags': tags  # Include tag names
                         })
                 
                 # Add the list to the context

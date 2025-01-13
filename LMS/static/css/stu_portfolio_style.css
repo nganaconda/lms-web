@@ -154,9 +154,9 @@ table tbody tr td[colspan="3"] {
     cursor: pointer;
 }
 .tag-btn.active {
-    background-color: #007bff;
+    background-color: #16a085;
     color: white;
-    border-color: #007bff;
+    border-color: #16a085;
 }
 
 
