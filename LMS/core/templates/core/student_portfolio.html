@@ -49,9 +49,40 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const tagButtons = document.querySelectorAll('.tag-btn');
+        const searchInput = document.getElementById('test-search');
+        const searchButton = document.getElementById('search-btn');
         const testRows = document.querySelectorAll('.test-row');
+        const tagButtons = document.querySelectorAll('.tag-btn');
 
+        let activeTag = null; // Keeps track of the active tag filter
+
+        // Function to filter tests
+        function filterTests() {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            testRows.forEach(row => {
+                const testName = row.querySelector('a').textContent.toLowerCase();
+                const rowTags = row.getAttribute('data-tags').toLowerCase();
+
+                // Show row if it matches the search term and active tag (if any)
+                const matchesSearch = testName.includes(searchTerm) || rowTags.includes(searchTerm);
+                const matchesTag = !activeTag || rowTags.includes(activeTag.toLowerCase());
+
+                if (matchesSearch && matchesTag) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Add event listener to the search input
+        searchInput.addEventListener('input', filterTests);
+
+        // Add event listener to the search button (optional, for manual search trigger)
+        searchButton.addEventListener('click', filterTests);
+
+        // Add event listeners to tag buttons
         tagButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const selectedTag = button.getAttribute('data-tag');
@@ -59,18 +90,12 @@
 
                 // Toggle active state
                 tagButtons.forEach(btn => btn.classList.remove('active'));
+                activeTag = isActive ? null : selectedTag;
+
                 if (!isActive) button.classList.add('active');
 
                 // Filter tests
-                const filterTag = isActive ? null : selectedTag;
-                testRows.forEach(row => {
-                    const rowTags = row.getAttribute('data-tags');
-                    if (filterTag && !rowTags.includes(filterTag)) {
-                        row.style.display = 'none';
-                    } else {
-                        row.style.display = '';
-                    }
-                });
+                filterTests();
             });
         });
     });
