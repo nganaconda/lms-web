@@ -419,6 +419,14 @@ def addTest(request):
                                     weight=weight
                                 )
                             
+                            tags = request.POST.get('tags', '')  # Get comma-separated tags
+                            tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]  # Clean and split tags
+
+                            # Save each tag and associate it with the test
+                            for tag_name in tag_list:
+                                tag_obj, created = Tag.objects.get_or_create(tag_name=tag_name)
+                                TestTag.objects.create(test=test, tag=tag_obj)
+                                                        
                             test.questions.set(selected_questions)  # Assign questions to the test
                             test.save()
                             return redirect('viewCreated', test_gid=test.gid)  # Redirect to test view

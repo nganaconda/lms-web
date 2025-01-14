@@ -116,6 +116,28 @@ form button[type="submit"]:hover {
     box-shadow: 0 4px 8px rgba(33, 136, 56, 0.3);
 }
 
+#tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.tag {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    padding: 0.2rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.remove-tag {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: red;
+    font-size: 1rem;
+}
+
 /* Footer */
 footer {
     text-align: center;

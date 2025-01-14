@@ -51,12 +51,59 @@
                             {{ form.classGroup }}
                         </div>
                     </div>
+
+                    <!-- Tag Section -->
+                    <div>
+                        <h2>Search Tags</h2>
+                        <p>Add tags to help categorize and filter this test. Press Enter after typing each tag.</p>
+                        <div id="tags-container">
+                            <input type="text" id="tag-input" placeholder="Enter a tag" />
+                        </div>
+                        <input type="hidden" name="tags" id="hidden-tags-input" value="" />
+                    </div>
                 
                     <button type="submit">Create Test</button>
                 </form>
 {% endblock %}
 {% block extra_scripts %}
     <script>
+
+        const tagInput = document.getElementById('tag-input');
+        const tagsContainer = document.getElementById('tags-container');
+        const hiddenTagsInput = document.getElementById('hidden-tags-input');
+        let tags = [];
+
+        tagInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+
+                const newTag = tagInput.value.trim();
+                if (newTag && !tags.includes(newTag)) {
+                    tags.push(newTag);
+
+                    const tagElement = document.createElement('span');
+                    tagElement.classList.add('tag');
+                    tagElement.textContent = newTag;
+
+                    const removeButton = document.createElement('button');
+                    removeButton.type = 'button';
+                    removeButton.textContent = '×';
+                    removeButton.classList.add('remove-tag');
+                    removeButton.addEventListener('click', function () {
+                        tags = tags.filter(tag => tag !== newTag);
+                        tagsContainer.removeChild(tagElement);
+                        hiddenTagsInput.value = tags.join(',');
+                    });
+
+                    tagElement.appendChild(removeButton);
+                    tagsContainer.appendChild(tagElement);
+                    hiddenTagsInput.value = tags.join(',');
+                }
+
+                tagInput.value = '';
+            }
+        });
+
         document.getElementById('add-test-form').addEventListener('submit', function (event) {
             const levelInput = document.getElementById('id_level');
             const questionsNoInput = document.getElementById('id_questions_no');
