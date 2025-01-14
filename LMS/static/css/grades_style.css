@@ -82,7 +82,8 @@ main {
 /* Test Type Buttons */
 .type-toggle {
     display: block;
-    background-color: #3498db;
+    width: 100%;
+    background-color: #1abc9cad;
     color: white;
     padding: 12px 20px;
     margin-bottom: 10px;
@@ -96,7 +97,7 @@ main {
 }
 
 .type-toggle:hover {
-    background-color: #2980b9;
+    background-color: #139379;
 }
 
 /* Test List */

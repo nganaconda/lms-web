@@ -1461,14 +1461,14 @@ def viewGrades(request):
                             'tests': type_tests  # To show individual tests later
                         })
                         
-                        # Add the list to the context
-                        contextNow = {
-                            'username': username,
-                            'overall_average': overall_average,
-                            'type_averages': type_averages
-                        }
+                # Add the list to the context
+                contextNow = {
+                    'username': username,
+                    'overall_average': overall_average,
+                    'type_averages': type_averages
+                }
 
-                        return render(request, 'core/viewGrades.html', contextNow)
+                return render(request, 'core/viewGrades.html', contextNow)
 
             except Student.DoesNotExist:
                 return redirect('403.html')  # Or handle as appropriate
